@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>PetaByteMind — Scale your intelligence</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&family=Space+Grotesk:wght@500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com/3.4.17"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<style>
+:root{--bg:#07080d;--panel:rgba(255,255,255,.04);--line:rgba(255,255,255,.09);--text:#e8ecf5;--mute:#8a93a8;--cyan:#22e4ff;--violet:#9b5cff;
+ box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html{background:var(--bg);scroll-padding-top:env(safe-area-inset-top,0px);color-scheme:dark}
+body{background:var(--bg);color:var(--text);font-family:Inter,system-ui,sans-serif;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+.display{font-family:'Space Grotesk',Inter,sans-serif;letter-spacing:-.03em}
+.mono{font-family:'JetBrains Mono',ui-monospace,monospace}
+.grid-bg{background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);background-size:56px 56px;-webkit-mask-image:radial-gradient(ellipse at 50% 40%,#000 20%,transparent 75%);mask-image:radial-gradient(ellipse at 50% 40%,#000 20%,transparent 75%)}
+.glass{background:var(--panel);border:1px solid var(--line);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px)}
+.word{display:inline-block;overflow:hidden;vertical-align:top;padding-bottom:.08em}
+.word>span{display:inline-block;will-change:transform}
+.grad{background:linear-gradient(100deg,var(--cyan),var(--violet));-webkit-background-clip:text;background-clip:text;color:transparent}
+.btn{position:relative;display:inline-flex;align-items:center;gap:.5rem;padding:.9rem 1.5rem;font-weight:500;border:1px solid var(--line);transition:box-shadow .25s,border-color .25s;will-change:transform}
+.btn-p{background:linear-gradient(100deg,var(--cyan),var(--violet));color:#05060a;border-color:transparent}
+.btn-p:hover{box-shadow:0 0 40px -4px var(--cyan),0 0 60px -10px var(--violet)}
+.btn-s:hover{border-color:var(--cyan);box-shadow:0 0 28px -8px var(--cyan),inset 0 0 18px -12px var(--cyan)}
+.card{position:relative;overflow:hidden}
+.soc{display:grid;place-items:center;width:52px;height:52px;color:var(--mute);transition:color .25s,border-color .25s,box-shadow .25s;will-change:transform}
+.soc:hover{color:var(--cyan);border-color:var(--cyan);box-shadow:0 0 28px -6px var(--cyan),inset 0 0 16px -10px var(--cyan)}
+.soc svg{width:22px;height:22px;fill:currentColor}
+.card::before{content:"";position:absolute;inset:0;background:radial-gradient(360px circle at var(--mx,50%) var(--my,0%),rgba(34,228,255,.14),transparent 60%);opacity:0;transition:opacity .3s;pointer-events:none}
+.card:hover::before{opacity:1}
+.icon path,.icon circle,.icon rect,.icon line{stroke-dasharray:1;stroke-dashoffset:1;fill:none;stroke:var(--cyan);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+.tk-c{color:#c08bff}.tk-s{color:#7df0b0}.tk-f{color:var(--cyan)}.tk-m{color:#5c6580}
+a:focus-visible,button:focus-visible{outline:2px solid var(--cyan);outline-offset:3px}
+@media (min-width:1024px){#h-track{display:flex;width:max-content}.h-panel{width:min(520px,38vw);flex:none}}
+@media (prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}}
+</style>
+</head>
+<body>
+
+<header class="fixed top-0 inset-x-0 z-50" style="padding-top:env(safe-area-inset-top,0px)">
+  <nav class="glass mx-3 mt-3 md:mx-auto md:max-w-5xl flex items-center justify-between px-5 py-3">
+    <a href="#top" class="display font-bold text-lg flex items-center gap-2" aria-label="PetaByteMind home">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M12 2 21 7v10l-9 5-9-5V7z" stroke="url(#lg)" stroke-width="1.6"/><circle cx="12" cy="12" r="3" fill="url(#lg)"/><defs><linearGradient id="lg" x1="0" y1="0" x2="24" y2="24"><stop stop-color="#22e4ff"/><stop offset="1" stop-color="#9b5cff"/></linearGradient></defs></svg>
+      PetaByteMind
+    </a>
+    <div class="hidden md:flex gap-8 text-sm" style="color:var(--mute)">
+      <a href="#capabilities" class="hover:text-white">Capabilities</a><a href="#scale" class="hover:text-white">Scale</a><a href="#build" class="hover:text-white">Build</a>
+    </div>
+    <a href="#build" class="btn btn-s mag !py-2 !px-4 text-sm">Get started</a>
+  </nav>
+</header>
+
+<main id="top">
+<!-- HERO -->
+<section id="hero" class="relative min-h-[100svh] flex items-center justify-center overflow-hidden px-6">
+  <div class="grid-bg absolute inset-0"></div>
+  <canvas id="net" class="absolute inset-0 w-full h-full" aria-hidden="true"></canvas>
+  <div class="relative z-10 max-w-5xl text-center pt-24">
+    <h1 id="h1" class="display font-bold leading-[.98]" style="font-size:clamp(2.6rem,8.5vw,7rem)">
+      Scale your intelligence. <span class="grad">Unleash the PetaByteMind.</span>
+    </h1>
+    <p class="hero-fade mx-auto mt-8 max-w-xl text-lg" style="color:var(--mute)">An inference and data platform built for workloads measured in petabytes. Ingest everything, ask anything, get answers in milliseconds.</p>
+    <div class="hero-fade mt-10 flex flex-wrap justify-center gap-4">
+      <a href="#build" class="btn btn-p mag">Start building</a>
+      <a href="#capabilities" class="btn btn-s mag glass">Explore capabilities</a>
+    </div>
+  </div>
+</section>
+
+<!-- CAPABILITIES (pinned horizontal on desktop) -->
+<section id="capabilities" class="relative overflow-hidden">
+  <div id="h-wrap" class="min-h-screen flex flex-col justify-center py-24 lg:py-0">
+    <div class="px-6 lg:px-[8vw] mb-10 max-w-3xl">
+      <h2 class="display font-bold" style="font-size:clamp(2rem,5vw,3.6rem)">Everything between raw bytes and a decision.</h2>
+    </div>
+    <div id="h-track" class="grid gap-5 px-6 lg:px-[8vw] lg:gap-6 sm:grid-cols-2 lg:grid-cols-none">
+      <article class="h-panel card glass p-8 min-h-[300px] flex flex-col justify-between">
+        <svg class="icon" width="54" height="54" viewBox="0 0 48 48"><path d="M6 14c0-3 8-6 18-6s18 3 18 6-8 6-18 6S6 17 6 14z"/><path d="M6 14v10c0 3 8 6 18 6s18-3 18-6V14"/><path d="M6 24v10c0 3 8 6 18 6s18-3 18-6V24"/></svg>
+        <div><h3 class="display text-2xl font-bold mb-2">Lossless ingestion</h3><p style="color:var(--mute)">Stream from object stores, warehouses and event buses. Schema drift is detected and reconciled while data is in flight.</p></div>
+      </article>
+      <article class="h-panel card glass p-8 min-h-[300px] flex flex-col justify-between">
+        <svg class="icon" width="54" height="54" viewBox="0 0 48 48"><circle cx="10" cy="24" r="4"/><circle cx="38" cy="10" r="4"/><circle cx="38" cy="38" r="4"/><circle cx="24" cy="24" r="4"/><line x1="14" y1="24" x2="20" y2="24"/><line x1="27" y1="22" x2="35" y2="12"/><line x1="27" y1="26" x2="35" y2="36"/></svg>
+        <div><h3 class="display text-2xl font-bold mb-2">Distributed inference</h3><p style="color:var(--mute)">Models shard across thousands of accelerators with automatic batching and sub-50ms p99 latency.</p></div>
+      </article>
+      <article class="h-panel card glass p-8 min-h-[300px] flex flex-col justify-between">
+        <svg class="icon" width="54" height="54" viewBox="0 0 48 48"><circle cx="21" cy="21" r="13"/><line x1="31" y1="31" x2="42" y2="42"/><path d="M14 22h4l3-6 4 11 3-5h2"/></svg>
+        <div><h3 class="display text-2xl font-bold mb-2">Semantic search</h3><p style="color:var(--mute)">Hybrid vector and keyword retrieval across trillions of embeddings, with filters that stay fast at any size.</p></div>
+      </article>
+      <article class="h-panel card glass p-8 min-h-[300px] flex flex-col justify-between">
+        <svg class="icon" width="54" height="54" viewBox="0 0 48 48"><path d="M24 4 40 10v13c0 10-7 17-16 21C15 40 8 33 8 23V10z"/><path d="m17 24 5 5 9-10"/></svg>
+        <div><h3 class="display text-2xl font-bold mb-2">Private by construction</h3><p style="color:var(--mute)">Per-tenant encryption keys, audit trails on every query, and regional pinning for regulated data.</p></div>
+      </article>
+      <article class="h-panel card glass p-8 min-h-[300px] flex flex-col justify-between">
+        <svg class="icon" width="54" height="54" viewBox="0 0 48 48"><rect x="6" y="8" width="36" height="32"/><path d="M6 18h36"/><path d="m14 28 5 4-5 4"/><line x1="24" y1="36" x2="32" y2="36"/></svg>
+        <div><h3 class="display text-2xl font-bold mb-2">One SDK, any stack</h3><p style="color:var(--mute)">TypeScript, Python and C# clients share one contract. Ship an integration in an afternoon.</p></div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- STATS -->
+<section id="scale" class="relative px-6 py-32">
+  <div class="max-w-6xl mx-auto grid gap-px sm:grid-cols-2 lg:grid-cols-4" style="background:var(--line);border:1px solid var(--line)">
+    <div class="stat p-10" style="background:var(--bg)"><div class="display font-bold text-5xl grad"><span data-to="4.2" data-d="1">0</span> PB</div><p class="mt-3" style="color:var(--mute)">indexed every day</p></div>
+    <div class="stat p-10" style="background:var(--bg)"><div class="display font-bold text-5xl grad"><span data-to="38" data-d="0">0</span> ms</div><p class="mt-3" style="color:var(--mute)">p99 query latency</p></div>
+    <div class="stat p-10" style="background:var(--bg)"><div class="display font-bold text-5xl grad"><span data-to="120000" data-d="0" data-f="1">0</span></div><p class="mt-3" style="color:var(--mute)">accelerators in the fleet</p></div>
+    <div class="stat p-10" style="background:var(--bg)"><div class="display font-bold text-5xl grad"><span data-to="99.99" data-d="2">0</span>%</div><p class="mt-3" style="color:var(--mute)">uptime, trailing 12 months</p></div>
+  </div>
+</section>
+
+<!-- CODE -->
+<section id="build" class="px-6 pb-32">
+  <div class="max-w-5xl mx-auto grid gap-10 lg:grid-cols-5 items-center">
+    <div class="lg:col-span-2 code-in">
+      <h2 class="display font-bold" style="font-size:clamp(2rem,4vw,3rem)">Four lines from bucket to answer.</h2>
+      <p class="mt-5" style="color:var(--mute)">Point PetaByteMind at your data, then ask in plain language. No cluster to size, no index to tune.</p>
+    </div>
+    <div class="lg:col-span-3 glass code-in">
+      <div class="flex items-center justify-between px-4 py-3" style="border-bottom:1px solid var(--line)">
+        <div class="flex gap-2" aria-hidden="true"><i class="w-3 h-3 rounded-full" style="background:#ff5f57"></i><i class="w-3 h-3 rounded-full" style="background:#febc2e"></i><i class="w-3 h-3 rounded-full" style="background:#28c840"></i></div>
+        <span class="mono text-xs" style="color:var(--mute)">quickstart.ts</span>
+        <button id="copy" class="mono text-xs px-3 py-1 glass hover:border-cyan-300 transition" aria-live="polite">Copy</button>
+      </div>
+<pre class="mono text-[13px] leading-7 p-5 overflow-x-auto" id="code"><code><span class="tk-c">import</span> { PetaByteMind } <span class="tk-c">from</span> <span class="tk-s">"@petabytemind/sdk"</span>;
+
+<span class="tk-c">const</span> mind = <span class="tk-c">new</span> <span class="tk-f">PetaByteMind</span>({ apiKey: process.env.PBM_KEY });
+<span class="tk-c">const</span> stream = <span class="tk-c">await</span> mind.<span class="tk-f">ingest</span>(<span class="tk-s">"s3://warehouse/events"</span>, { shards: <span class="tk-s">4096</span> });
+<span class="tk-c">const</span> answer = <span class="tk-c">await</span> mind.<span class="tk-f">ask</span>(<span class="tk-s">"Which cohorts churn after day 30?"</span>, { stream });
+
+console.<span class="tk-f">log</span>(answer.insight); <span class="tk-m">// ranked cohorts, with evidence</span></code></pre>
+    </div>
+  </div>
+</section>
+</main>
+
+<!-- FOOTER -->
+<footer class="relative overflow-hidden px-6 pt-32 pb-10" style="border-top:1px solid var(--line)">
+  <div class="grid-bg absolute inset-0 opacity-60"></div>
+  <div class="relative max-w-5xl mx-auto text-center">
+    <h2 class="display font-bold" style="font-size:clamp(2.4rem,7vw,5.5rem)">Your data already knows. <span class="grad">Ask it.</span></h2>
+    <div class="mt-10"><a href="#top" class="btn btn-p mag">Start building</a></div>
+    <nav aria-label="Social profiles" class="mt-14 flex justify-center gap-4">
+      <a class="soc glass mag" href="https://x.com/M11f20" target="_blank" rel="noopener noreferrer" aria-label="X (Twitter)"><svg viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg></a>
+      <a class="soc glass mag" href="https://github.com/M11F20" target="_blank" rel="noopener noreferrer" aria-label="GitHub"><svg viewBox="0 0 24 24"><path d="M12 .5C5.65.5.5 5.65.5 12c0 5.08 3.29 9.39 7.86 10.91.58.11.79-.25.79-.56v-2c-3.2.7-3.87-1.37-3.87-1.37-.52-1.33-1.28-1.69-1.28-1.69-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.18 1.76 1.18 1.03 1.76 2.69 1.25 3.35.96.1-.74.4-1.25.73-1.54-2.55-.29-5.24-1.28-5.24-5.69 0-1.26.45-2.28 1.18-3.09-.12-.29-.51-1.46.11-3.05 0 0 .97-.31 3.17 1.18a11 11 0 0 1 5.78 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.76.11 3.05.74.81 1.18 1.83 1.18 3.09 0 4.42-2.69 5.39-5.25 5.68.41.36.78 1.06.78 2.14v3.17c0 .31.21.68.8.56A11.51 11.51 0 0 0 23.5 12C23.5 5.65 18.35.5 12 .5z"/></svg></a>
+      <a class="soc glass mag" href="https://www.linkedin.com/in/m11f20" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn"><svg viewBox="0 0 24 24"><path d="M20.45 20.45h-3.56v-5.57c0-1.33-.03-3.04-1.85-3.04-1.86 0-2.14 1.45-2.14 2.94v5.67H9.35V9h3.41v1.56h.05c.48-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.46v6.28zM5.34 7.43a2.06 2.06 0 1 1 0-4.13 2.06 2.06 0 0 1 0 4.13zM7.12 20.45H3.56V9h3.56v11.45zM22.22 0H1.77C.79 0 0 .77 0 1.73v20.54C0 23.23.79 24 1.77 24h20.45c.98 0 1.78-.77 1.78-1.73V1.73C24 .77 23.2 0 22.22 0z"/></svg></a>
+      <a class="soc glass mag" href="https://www.facebook.com/m11f20" target="_blank" rel="noopener noreferrer" aria-label="Facebook"><svg viewBox="0 0 24 24"><path d="M24 12.07C24 5.4 18.63 0 12 0S0 5.4 0 12.07c0 6.02 4.39 11.02 10.13 11.93v-8.44H7.08v-3.49h3.05V9.41c0-3.02 1.79-4.69 4.53-4.69 1.31 0 2.69.24 2.69.24v2.97h-1.52c-1.49 0-1.96.93-1.96 1.88v2.26h3.33l-.53 3.49h-2.8V24C19.61 23.09 24 18.09 24 12.07z"/></svg></a>
+      <a class="soc glass mag" href="https://wa.me/9647712299299" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp"><svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg></a>
+    </nav>
+  </div>
+  <div class="relative max-w-5xl mx-auto mt-28 flex flex-col md:flex-row gap-8 justify-between text-sm" style="color:var(--mute)">
+    <div class="display font-bold text-xl text-white">PetaByteMind</div>
+    <div class="flex flex-wrap gap-x-8 gap-y-3">
+      <a href="#capabilities" class="hover:text-white">Capabilities</a><a href="#scale" class="hover:text-white">Scale</a><a href="#build" class="hover:text-white">Docs</a><a href="#top" class="hover:text-white">Security</a><a href="tel:+9647712299299" class="hover:text-white" aria-label="Call PetaByteMind">Contact</a>
+    </div>
+    <div>© 2026 PetaByteMind</div>
+  </div>
+</footer>
+
+<script>
+(() => {
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  gsap.registerPlugin(ScrollTrigger);
+
+  /* Hero headline: word-by-word mask reveal (one orchestrated entrance) */
+  const h1 = document.getElementById('h1');
+  const split = (node) => {
+    [...node.childNodes].forEach(n => {
+      if (n.nodeType === 3) {
+        const frag = document.createDocumentFragment();
+        n.textContent.split(/(\s+)/).forEach(t => {
+          if (!t.trim()) { frag.append(t); return; }
+          const w = document.createElement('span'); w.className = 'word';
+          w.innerHTML = '<span>' + t + '</span>'; frag.append(w);
+        });
+        n.replaceWith(frag);
+      } else if (n.nodeType === 1) split(n);
+    });
+  };
+  split(h1);
+  if (!reduce) {
+    gsap.timeline({ defaults: { ease: 'power4.out' } })
+      .from('#h1 .word>span', { yPercent: 115, duration: 1.1, stagger: .07 })
+      .from('.hero-fade', { y: 24, opacity: 0, duration: .8, stagger: .12 }, '-=.6')
+      .from('nav', { y: -30, opacity: 0, duration: .8 }, 0);
+  }
+
+  /* Particle network */
+  const cv = document.getElementById('net'), cx = cv.getContext('2d');
+  let W, H, pts = [], mouse = { x: -999, y: -999 }, running = true, dpr = Math.min(devicePixelRatio || 1, 2);
+  const size = () => {
+    W = cv.clientWidth; H = cv.clientHeight; cv.width = W * dpr; cv.height = H * dpr; cx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    const n = Math.round(Math.min(110, W * H / 14000));
+    pts = Array.from({ length: n }, () => ({ x: Math.random() * W, y: Math.random() * H, vx: (Math.random() - .5) * .35, vy: (Math.random() - .5) * .35 }));
+  };
+  size(); addEventListener('resize', size);
+  addEventListener('pointermove', e => { const r = cv.getBoundingClientRect(); mouse.x = e.clientX - r.left; mouse.y = e.clientY - r.top; });
+  new IntersectionObserver(([e]) => { running = e.isIntersecting; if (running) tick(); }).observe(cv);
+  function tick() {
+    if (!running) return;
+    cx.clearRect(0, 0, W, H);
+    for (const p of pts) {
+      const dx = mouse.x - p.x, dy = mouse.y - p.y, d = Math.hypot(dx, dy);
+      if (d < 160) { p.vx += dx / d * .012; p.vy += dy / d * .012; }
+      p.vx *= .995; p.vy *= .995;
+      p.x += p.vx; p.y += p.vy;
+      if (p.x < 0 || p.x > W) p.vx *= -1;
+      if (p.y < 0 || p.y > H) p.vy *= -1;
+    }
+    for (let i = 0; i < pts.length; i++) {
+      const a = pts[i];
+      for (let j = i + 1; j < pts.length; j++) {
+        const b = pts[j], d = Math.hypot(a.x - b.x, a.y - b.y);
+        if (d < 130) { cx.strokeStyle = `rgba(34,228,255,${(1 - d / 130) * .35})`; cx.lineWidth = 1; cx.beginPath(); cx.moveTo(a.x, a.y); cx.lineTo(b.x, b.y); cx.stroke(); }
+      }
+      cx.fillStyle = 'rgba(155,92,255,.9)'; cx.beginPath(); cx.arc(a.x, a.y, 1.8, 0, 6.283); cx.fill();
+    }
+    if (!reduce) requestAnimationFrame(tick);
+  }
+  tick();
+
+  /* Magnetic buttons + card glow (fine pointers only) */
+  if (matchMedia('(pointer:fine)').matches && !reduce) {
+    document.querySelectorAll('.mag').forEach(el => {
+      const qx = gsap.quickTo(el, 'x', { duration: .4, ease: 'power3.out' }), qy = gsap.quickTo(el, 'y', { duration: .4, ease: 'power3.out' });
+      el.addEventListener('pointermove', e => { const r = el.getBoundingClientRect(); qx((e.clientX - r.left - r.width / 2) * .3); qy((e.clientY - r.top - r.height / 2) * .4); });
+      el.addEventListener('pointerleave', () => { gsap.to(el, { x: 0, y: 0, duration: .8, ease: 'elastic.out(1,.4)' }); });
+    });
+  }
+  document.querySelectorAll('.card').forEach(c => c.addEventListener('pointermove', e => {
+    const r = c.getBoundingClientRect(); c.style.setProperty('--mx', (e.clientX - r.left) + 'px'); c.style.setProperty('--my', (e.clientY - r.top) + 'px');
+  }));
+
+  /* Section animations via matchMedia: pinned horizontal on desktop, staggered reveal on mobile */
+  const mm = gsap.matchMedia();
+  const drawIcons = (panel) => gsap.to(panel.querySelectorAll('.icon path,.icon circle,.icon rect,.icon line'), { strokeDashoffset: 0, duration: 1.2, ease: 'power2.out', stagger: .08, overwrite: true });
+  document.querySelectorAll('.icon *').forEach(s => { try { s.setAttribute('pathLength', 1); } catch (e) {} });
+  if (reduce) document.querySelectorAll('.icon *').forEach(s => s.style.strokeDashoffset = 0);
+
+  mm.add('(min-width:1024px)', () => {
+    if (reduce) return;
+    const track = document.getElementById('h-track');
+    const dist = () => Math.max(0, track.scrollWidth - innerWidth + innerWidth * .08);
+    gsap.to(track, { x: () => -dist(), ease: 'none',
+      scrollTrigger: { trigger: '#h-wrap', pin: true, scrub: 1, start: 'top top', end: () => '+=' + dist(), invalidateOnRefresh: true, anticipatePin: 1 } });
+    document.querySelectorAll('.h-panel').forEach(p => ScrollTrigger.create({
+      trigger: p, containerAnimation: gsap.getTweensOf(track)[0], start: 'left 85%', once: true, onEnter: () => drawIcons(p) }));
+  });
+  mm.add('(max-width:1023px)', () => {
+    if (reduce) return;
+    gsap.from('.h-panel', { y: 50, opacity: 0, duration: .8, stagger: .12, ease: 'power3.out', scrollTrigger: { trigger: '#h-track', start: 'top 85%', once: true } });
+    document.querySelectorAll('.h-panel').forEach(p => ScrollTrigger.create({ trigger: p, start: 'top 85%', once: true, onEnter: () => drawIcons(p) }));
+  });
+
+  /* Counters */
+  document.querySelectorAll('[data-to]').forEach(el => {
+    const to = +el.dataset.to, d = +el.dataset.d, f = el.dataset.f, o = { v: 0 };
+    const fmt = v => f ? Math.round(v).toLocaleString('en-US') : v.toFixed(d);
+    if (reduce) { el.textContent = fmt(to); return; }
+    ScrollTrigger.create({ trigger: el, start: 'top 88%', once: true, onEnter: () =>
+      gsap.to(o, { v: to, duration: 2.2, ease: 'power3.out', onUpdate: () => el.textContent = fmt(o.v) }) });
+  });
+  if (!reduce) {
+    gsap.from('.stat', { y: 40, opacity: 0, stagger: .12, duration: .8, ease: 'power3.out', scrollTrigger: { trigger: '#scale', start: 'top 75%', once: true } });
+    gsap.from('.code-in', { y: 50, opacity: 0, stagger: .15, duration: .9, ease: 'power3.out', scrollTrigger: { trigger: '#build', start: 'top 75%', once: true } });
+    gsap.from('footer h2, footer .btn, footer .soc', { y: 40, opacity: 0, stagger: .15, duration: .9, ease: 'power3.out', scrollTrigger: { trigger: 'footer', start: 'top 70%', once: true } });
+  }
+
+  /* Copy */
+  const btn = document.getElementById('copy');
+  btn.addEventListener('click', async () => {
+    const text = document.getElementById('code').innerText;
+    try { await navigator.clipboard.writeText(text); }
+    catch (e) { const t = document.createElement('textarea'); t.value = text; document.body.append(t); t.select(); try { document.execCommand('copy'); } catch (_) {} t.remove(); }
+    btn.textContent = 'Copied'; setTimeout(() => btn.textContent = 'Copy', 1600);
+  });
+
+  addEventListener('load', () => ScrollTrigger.refresh());
+})();
+</script>
+</body>
+</html>
