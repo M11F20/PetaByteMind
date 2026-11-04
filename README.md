@@ -1,9 +1,14 @@
+<div align="center">
+  <img src="./public/assets/hud-banner.svg" alt="PetaByteMind Cinematic IDE HUD Banner" width="100%" />
+</div>
+
 # PetaByteMind // The Cinematic IDE & Systems Portfolio
 
 > **"The Engineer as a Filmmaker."**  
 > A dark-mode, cinematic Integrated Development Environment (IDE) merged with a non-linear video editor (DaVinci Resolve meets Linear and Bloomberg Terminal).
 
 ---
+
 
 ## Architecture & Workspaces
 
@@ -63,3 +68,4 @@ npm run start
 ### Keyboard Shortcuts
 - `Cmd + K` or `Ctrl + K`: Open Command Palette / Dispatch Protocol
 - `Esc`: Close Command Palette
+s
