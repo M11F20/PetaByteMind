@@ -1,0 +1,81 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --void: #0B0E11;
+  --graphite: #1F2428;
+  --slate-border: #2D333B;
+  --ash-muted: #8B949E;
+  --signal-pure: #F0F6FC;
+  --cyan-hyper: #34D3D5;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  background-color: var(--void);
+  color: var(--signal-pure);
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Custom Sleek Technical Scrollbar */
+::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+
+::-webkit-scrollbar-track {
+  background: #0B0E11;
+  border-inline-start: 1px solid #2D333B;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #2D333B;
+  border-radius: 0px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #34D3D5;
+}
+
+/* Terminal Cursor */
+.terminal-cursor {
+  display: inline-block;
+  width: 8px;
+  height: 15px;
+  background-color: var(--cyan-hyper);
+  vertical-align: middle;
+  animation: blink 1s step-start infinite;
+}
+
+@keyframes blink {
+  50% {
+    opacity: 0;
+  }
+}
+
+/* RTL Specific typography overrides */
+[dir="rtl"] {
+  font-family: var(--font-arabic), "IBM Plex Sans Arabic", "Inter", sans-serif;
+}
+
+/* Enforce Latin/English Monospace for all code, telemetry, coordinates and timestamps */
+code,
+pre,
+kbd,
+.font-mono,
+[data-telemetry] {
+  font-family: var(--font-mono), "JetBrains Mono", monospace !important;
+  direction: ltr !important;
+  unicode-bidi: isolate;
+}
