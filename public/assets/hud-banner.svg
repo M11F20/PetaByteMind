@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 320" width="100%" height="100%">
+  <defs>
+    <pattern id="ide-grid" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#2D333B" stroke-width="0.6" stroke-opacity="0.55" />
+    </pattern>
+  </defs>
+
+  <!-- Base Canvas: Void Charcoal -->
+  <rect width="1200" height="320" fill="#0B0E11" />
+  <rect width="1200" height="320" fill="url(#ide-grid)" />
+
+  <!-- Outer 1px Structural Frame -->
+  <rect x="16" y="16" width="1168" height="288" fill="none" stroke="#2D333B" stroke-width="1" />
+  <line x1="16" y1="52" x2="1184" y2="52" stroke="#2D333B" stroke-width="1" />
+  <line x1="16" y1="268" x2="1184" y2="268" stroke="#2D333B" stroke-width="1" />
+
+  <!-- Top Telemetry Bar -->
+  <circle cx="38" cy="34" r="4" fill="#34D3D5" />
+  <text x="52" y="38" fill="#F0F6FC" font-family="JetBrains Mono, monospace" font-size="11" letter-spacing="1.5">SYS.01 // PETABYTEMIND_IDE</text>
+  <text x="540" y="38" fill="#8B949E" font-family="JetBrains Mono, monospace" font-size="11" letter-spacing="1.5">REC [60.0 FPS // AV1 // 4K]</text>
+  <text x="1035" y="38" fill="#34D3D5" font-family="JetBrains Mono, monospace" font-size="11" letter-spacing="1.5">LOCALE: EN // AR</text>
+
+  <!-- Hyper Cyan Corner Reticles (<5% Focal Accent) -->
+  <path d="M 40 88 L 40 72 L 56 72" fill="none" stroke="#34D3D5" stroke-width="2" />
+  <path d="M 1160 88 L 1160 72 L 1144 72" fill="none" stroke="#34D3D5" stroke-width="2" />
+  <path d="M 40 232 L 40 248 L 56 248" fill="none" stroke="#34D3D5" stroke-width="2" />
+  <path d="M 1160 232 L 1160 248 L 1144 248" fill="none" stroke="#34D3D5" stroke-width="2" />
+
+  <!-- Center Title Block -->
+  <text x="600" y="148" text-anchor="middle" fill="#F0F6FC" font-family="JetBrains Mono, monospace" font-weight="700" font-size="42" letter-spacing="6">PETABYTEMIND</text>
+  <text x="600" y="182" text-anchor="middle" fill="#34D3D5" font-family="JetBrains Mono, monospace" font-size="13" letter-spacing="4">THE ENGINEER AS A FILMMAKER // المهندس كصانع أفلام</text>
+  <text x="600" y="212" text-anchor="middle" fill="#8B949E" font-family="JetBrains Mono, monospace" font-size="11" letter-spacing="2">[01 COMMAND]   —   [02 VAULT]   —   [03 DOSSIER]   —   [04 NETWORK]</text>
+
+  <!-- Bottom Telemetry Bar -->
+  <text x="32" y="290" fill="#8B949E" font-family="JetBrains Mono, monospace" font-size="11" letter-spacing="1">COORD: [X:01, Y:04] // TC 00:00:00:00</text>
+  <text x="955" y="290" fill="#8B949E" font-family="JetBrains Mono, monospace" font-size="11" letter-spacing="1">DIRECTOR: M11F20 // BUILD: v1.0</text>
+</svg>
