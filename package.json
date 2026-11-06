@@ -9,36 +9,35 @@
     "start": "next start",
     "deploy": "opennextjs-cloudflare build --dangerouslyUseUnsupportedNextVersion && opennextjs-cloudflare deploy",
     "preview": "opennextjs-cloudflare build --dangerouslyUseUnsupportedNextVersion && opennextjs-cloudflare preview"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/M11F20/petabytemind.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/M11F20/petabytemind/issues"
+  },
+  "homepage": "https://github.com/M11F20/petabytemind#readme",
+  "dependencies": {
+    "@types/node": "^26.6.6",
+    "autoprefixer": "^10.6.2",
+    "clsx": "^2.1.1",
+    "framer-motion": "^14.9.0",
+    "lucide-react": "^1.67.0",
+    "next": "^14.2.35",
+    "postcss": "^8.5.32",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "tailwind-merge": "^3.7.0",
+    "tailwindcss": "^3.4.19"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "typescript": "^5.6.3"
   }
-},
-"repository": {
-  "type": "git",
-  "url": "git+https://github.com/M11F20/petabytemind.git"
-},
-"keywords": [],
-"author": "",
-"license": "ISC",
-"type": "commonjs",
-"bugs": {
-  "url": "https://github.com/M11F20/petabytemind/issues"
-},
-"homepage": "https://github.com/M11F20/petabytemind#readme",
-"dependencies": {
-  "@types/node": "^26.6.6",
-  "autoprefixer": "^10.6.2",
-  "clsx": "^2.1.1",
-  "framer-motion": "^14.9.0",
-  "lucide-react": "^1.67.0",
-  "next": "^16.4.5",
-  "postcss": "^8.5.32",
-  "react": "^19.3.1",
-  "react-dom": "^19.3.1",
-  "tailwind-merge": "^3.7.0",
-  "tailwindcss": "^3.4.19"
-},
-"devDependencies": {
-  "@types/react": "^18.3.12",
-  "@types/react-dom": "^18.3.1",
-  "typescript": "^5.6.3"
-}
 }
