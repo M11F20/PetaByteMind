@@ -122,7 +122,7 @@ jobs:
           echo "url=${url}" >> "$GITHUB_OUTPUT"
       - name: Comment preview URL
         if: steps.creds.outputs.ready == 'true' && steps.upload.outputs.url != ''
-        uses: actions/github-script@v8
+        uses: actions/github-script@v9
         with:
           script: |
             const url = '${{ steps.upload.outputs.url }}';
