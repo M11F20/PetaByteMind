@@ -9,14 +9,14 @@
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",
     "test:e2e": "playwright test",
-    "cf:build": "opennextjs-cloudflare build",
+    "cf:build": "opennextjs-cloudflare build --openNextConfigPath cloudflare/open-next.config.ts",
     "cf:typegen": "wrangler types --env-interface CloudflareEnv cloudflare-env.d.ts",
-    "preview": "opennextjs-cloudflare build && wrangler dev",
+    "preview": "npm run cf:build && wrangler dev",
     "db:generate": "drizzle-kit generate",
     "db:migrate:local": "wrangler d1 migrations apply DB --local",
     "db:migrate:remote": "wrangler d1 migrations apply DB --remote",
     "cf:ci": "bash scripts/cf-ci.sh",
-    "deploy": "bash scripts/cf-ci.sh"
+    "deploy": "wrangler deploy"
   },
   "repository": {
     "type": "git",
