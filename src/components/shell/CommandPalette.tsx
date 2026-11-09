@@ -3,7 +3,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useWorkspace } from '@/context/WorkspaceContext';
 import { useDirection } from '@/context/DirectionContext';
-import { WorkspaceId, ComplexityLevel } from '@/types';
 import {
   Search,
   Terminal,
@@ -25,17 +24,14 @@ export function CommandPalette() {
     setComplexityFilter,
   } = useWorkspace();
 
-  const { language, setLanguage, t } = useDirection();
+  const { setLanguage } = useDirection();
   const [query, setQuery] = useState('');
   const [selectedIndex, setSelectedIndex] = useState(0);
   const inputRef = useRef<HTMLInputElement | null>(null);
 
+  // Fresh state per open comes from the parent remounting this component; only focus is imperative.
   useEffect(() => {
-    if (commandPaletteOpen) {
-      setQuery('');
-      setSelectedIndex(0);
-      setTimeout(() => inputRef.current?.focus(), 50);
-    }
+    if (commandPaletteOpen) inputRef.current?.focus();
   }, [commandPaletteOpen]);
 
   if (!commandPaletteOpen) return null;
@@ -76,8 +72,8 @@ export function CommandPalette() {
     {
       id: 'ws-dossier',
       category: 'WORKSPACE',
-      label: 'Switch to 03. The Engineering Dossier',
-      sublabel: 'Research portfolio, empirical benchmarks & IEEE/ACM publications',
+      label: 'Switch to 03. Systems Blueprints',
+      sublabel: 'Architecture studies, design targets & 5G network slicing roadmap',
       icon: <FileText className="w-4 h-4 text-cyan-hyper" />,
       action: () => {
         setActiveWorkspace('dossier');
@@ -88,7 +84,7 @@ export function CommandPalette() {
       id: 'ws-network',
       category: 'WORKSPACE',
       label: 'Switch to 04. The Global Network',
-      sublabel: 'Slack intake pipeline & MENA <-> North America bridge nodes',
+      sublabel: 'Slack intake, live edge presence & MENA <-> North America bridge',
       icon: <Globe className="w-4 h-4 text-cyan-hyper" />,
       action: () => {
         setActiveWorkspace('network');

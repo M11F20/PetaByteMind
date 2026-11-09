@@ -1,15 +1,17 @@
 'use client';
 
 import React, { useRef, useEffect, useState } from 'react';
-import { Play, Pause, Maximize2, Volume2, VolumeX, Radio, Sparkles } from 'lucide-react';
+import { Play, Pause, Volume2, VolumeX, Radio } from 'lucide-react';
 import { useWorkspace } from '@/context/WorkspaceContext';
 import { useDirection } from '@/context/DirectionContext';
+import { useClock } from '@/context/ClockContext';
 import { ReticleCorner, CrosshairReticle } from './ReticleCorner';
 
 export function VideoViewportHUD() {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
-  const { liveFps, smpteTimecode, isPlayingPreview, setIsPlayingPreview } = useWorkspace();
-  const { t, language } = useDirection();
+  const { isPlayingPreview, setIsPlayingPreview } = useWorkspace();
+  const { fps: liveFps, timecode: smpteTimecode } = useClock();
+  const { t } = useDirection();
   const [activeChapter, setActiveChapter] = useState(0);
   const [isMuted, setIsMuted] = useState(true);
   const [progressPercent, setProgressPercent] = useState(38);

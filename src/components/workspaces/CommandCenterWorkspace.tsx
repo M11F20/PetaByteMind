@@ -5,10 +5,10 @@ import { VideoViewportHUD } from '@/components/hud/VideoViewportHUD';
 import { SystemNodeGraph } from '@/components/hud/SystemNodeGraph';
 import { TelemetryInspector } from '@/components/hud/TelemetryInspector';
 import { useDirection } from '@/context/DirectionContext';
-import { Terminal, Shield, Zap, Sparkles } from 'lucide-react';
+import { Shield, Zap } from 'lucide-react';
 
 export function CommandCenterWorkspace() {
-  const { t, language } = useDirection();
+  const { language } = useDirection();
 
   return (
     <div className="w-full h-full flex flex-col space-y-4 p-3 md:p-4 overflow-y-auto">

@@ -24,14 +24,14 @@ The application is structured around a persistent IDE Viewport Shell hosting fou
    - Interactive 4-stage architecture pipeline (Kernel Bus `io_uring` → SIMD Dedup `AVX-512` → Raft Consensus Ring → Agent Dispatch `Tree-sitter`).
    - Timestamped kernel code snapshot cards with copyable source snippets.
 
-3. **`03 DOSSIER` (The Engineering Dossier)**
-   - Tailored for North American graduate admissions committees (Stanford, MIT, CMU, Berkeley) and Principal R&D Labs.
-   - Systems Case Study Blueprints with empirical problem statements and measured benchmarks (P99 latency, L3 cache miss reductions, DRAM compaction).
-   - Filterable IEEE / ACM publications archive with citations, preprint links, and DOI metadata.
+3. **`03 DOSSIER` (Systems Blueprints)**
+   - Architecture studies with **modeled design targets**, explicitly labeled as not yet measured.
+   - Research Roadmap: Senior Graduation Project — *5G Private Networks & Network Slicing* on an SDR testbed. Measured SDR metrics and URLLC / mMTC / eMBB slice benchmarks replace the design studies as they land.
 
 4. **`04 NETWORK` (The Global Network)**
-   - Gated Slack intake pipeline protocol (`@handle` verification, specialty clusters, regional gateway routing).
-   - Active trans-regional corridor build spotlights connecting builders across the MENA region and North America (Baghdad ↔ Toronto ↔ Boston ↔ Dubai ↔ Cairo).
+   - Real intake pipeline: Turnstile → zod → rate limit → D1 → Slack webhook.
+   - Live edge presence over a Durable Object WebSocket (country + Cloudflare POP only — no IPs stored).
+   - Spotlights rendered from verified D1 members only.
 
 ---
 
@@ -51,21 +51,77 @@ The application is structured around a persistent IDE Viewport Shell hosting fou
 
 ---
 
+## Edge Architecture (100% Cloudflare)
+
+```
+Browser ──HTTPS──▶ Worker (workers/entry.ts)
+                    ├── /api/presence  ──WebSocket──▶ Durable Object `PresenceRoom` (hibernatable)
+                    └── everything else ─▶ Next.js 16 via OpenNext
+                          ├── /en, /ar           SSG, served from static assets
+                          ├── /api/intake        Rate Limit → Turnstile → D1 → Slack (waitUntil)
+                          ├── /api/telemetry     GET: request.cf edge info + p75 Web Vitals (KV 60s)
+                          │                      POST: RUM beacon sink → D1
+                          ├── /api/github        Latest commit + CI run (KV 120s)
+                          └── /api/members       Verified spotlights (D1, KV 300s)
+Cron 03:17 UTC ─▶ prune Web Vitals older than 30 days
+```
+
+| Concern | Service | Binding |
+| :--- | :--- | :--- |
+| Relational data | D1 + Drizzle ORM | `DB` |
+| Read-heavy cache | Workers KV | `CACHE` |
+| Real-time presence | Durable Objects (SQLite-backed) | `PRESENCE` |
+| Abuse protection | Workers Rate Limiting + Turnstile | `INTAKE_LIMITER`, `TELEMETRY_LIMITER` |
+
+Vault snippets and Blueprints content ship in the JS bundle (`src/data/content.ts`): the CDN serves them with zero lookups, which beats any KV read.
+
+**Every number shown is measured or labeled.** Build status comes from the GitHub API. RTT is `request.cf.clientTcpRtt` and POP is `request.cf.colo`. FPS comes from `requestAnimationFrame`, the live count from the DO, and P75 LCP/INP/CLS from real visitors. Design targets are labeled *modeled*.
+
+---
+
 ## Quickstart
 
-### Development
 ```bash
-npm run dev
+npm ci
+cp .dev.vars.example .dev.vars          # Turnstile always-pass test secret
+npm run db:migrate:local
+npm run dev                             # Next.js dev with D1/KV/rate-limit bindings via Miniflare
+npm run preview                         # Full Worker incl. Durable Object WebSockets on :8787
 ```
-Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-### Production Build
+### Quality gates
 ```bash
-npm run build
-npm run start
+npm run typecheck && npm run lint
+npm run build && npm run test:e2e       # Playwright: EN/AR × desktop/tablet/mobile, overflow + content integrity
+npm run cf:build && scripts/smoke.sh    # Real Worker: D1, KV, DO, rate limits
 ```
+
+### Database
+```bash
+# edit src/server/db/schema.ts, then:
+npm run db:generate
+npm run db:migrate:local
+# approve an intake / publish a spotlight:
+npx wrangler d1 execute petabytemind --remote --command "UPDATE intake_requests SET status='approved' WHERE id=1"
+npx wrangler d1 execute petabytemind --remote --command "INSERT INTO members (handle,display_name,location,hub,discipline,project,project_url,approved_at) VALUES ('handle','Name','Baghdad, IQ','MENA','Distributed Systems','Project','https://github.com/...',unixepoch()*1000)"
+```
+
+### CI/CD (`.github/workflows/ci.yml`)
+`quality` (tsc, eslint with zero warnings, schema/migration drift check) → `e2e` + `worker-smoke` → **preview** (PRs: `wrangler versions upload --preview-alias pr-N`, URL posted as a comment) or **deploy** (main: D1 migrations, `wrangler deploy`, health check).
+
+**One-time setup:**
+
+| GitHub setting | Name | Value |
+| :--- | :--- | :--- |
+| Secret | `CLOUDFLARE_API_TOKEN` | Token with *Workers Scripts, D1, Workers KV, Workers Routes: Edit* |
+| Secret | `CLOUDFLARE_ACCOUNT_ID` | Your account ID |
+| Secret | `TURNSTILE_SECRET_KEY` | Turnstile widget secret |
+| Secret | `SLACK_WEBHOOK_URL` | *(optional)* Slack Incoming Webhook |
+| Secret | `GH_STATUS_TOKEN` | *(optional)* fine-grained read-only token for higher GitHub API limits |
+| Variable | `TURNSTILE_SITE_KEY` | Turnstile widget site key (hostname: petabytemind.com) |
+
+D1 and KV are **auto-provisioned** on the first `wrangler deploy`. No IDs to copy.
 
 ### Keyboard Shortcuts
 - `Cmd + K` or `Ctrl + K`: Open Command Palette / Dispatch Protocol
 - `Esc`: Close Command Palette
-s

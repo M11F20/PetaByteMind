@@ -1,4 +1,4 @@
-import { PillarNode, VaultSnippet, DossierCaseStudy, NetworkMemberNode } from '@/types';
+import type { PillarNode, VaultSnippet, DossierCaseStudy, RoadmapItem } from '@/types';
 
 export const SYSTEM_PILLARS: PillarNode[] = [
   {
@@ -190,7 +190,7 @@ export const DOSSIER_CASE_STUDIES: DossierCaseStudy[] = [
     index: 'CS-SYS-801',
     title: 'Lock-Free Stream Deduplication Engine with Mechanical Cache Sympathy',
     titleAr: 'محرك إزالة تكرار البيانات المباشر الخالي من الأقفال مع التوافق مع الكاش',
-    targetCommittee: 'Systems & Operating Systems Lab / Graduate Admissions (Stanford / CMU)',
+    targetCommittee: 'Systems & Operating Systems Research',
     leadResearchArea: 'Distributed Systems & Memory Hierarchy',
     problemStatement: 'Modern cloud ingestion pipelines suffer catastrophic throughput collapse when duplicate event bursts trigger lock contention across high-core-count NUMA sockets. Traditional Redis or distributed hash set approaches degrade to >35ms latency at 2M events/sec.',
     problemStatementAr: 'تنهار خطوط إدخال البيانات السحابية عند حدوث طفرات تكرار مفاجئة تسبب نزاعاً على الأقفال عبر معالجات NUMA، حيث تتدهور الحلول التقليدية إلى تأخير يتجاوز 35ms عند 2 مليون حدث في الثانية.',
@@ -203,18 +203,14 @@ export const DOSSIER_CASE_STUDIES: DossierCaseStudy[] = [
       { metric: 'CPU Energy Draw / Million Ops', metricAr: 'استهلاك الطاقة لكل مليون عملية', baseline: '4.8 W·s', petabyteResult: '0.9 W·s', delta: '81% Savings' },
     ],
     architectureDiagramType: 'lock_free_ring_simd',
-    paperReference: {
-      venue: 'ACM SIGOPS / OSDI 2026 Submission Archive',
-      doi: '10.1145/3812901.petabyte.dedup',
-      preprintUrl: '#open-preprint-cs-01',
-    },
+    status: 'DESIGN_STUDY',
   },
   {
     id: 'cs-02',
     index: 'CS-AGI-904',
     title: 'Deterministic Verification Sandboxes for Autonomous Agentic Tool Invocation',
     titleAr: 'بيئات عزل واختبار قطعية لتنفيذ أدوات الوكلاء البرمجية المستقلة',
-    targetCommittee: 'AI Systems & Compilers Lab / Senior Research Scientist Admissions',
+    targetCommittee: 'AI Systems & Program Synthesis',
     leadResearchArea: 'Agentic AI Systems, Compilers & Program Synthesis',
     problemStatement: 'Unconstrained code-generating AI agents produce non-deterministic hallucinations, silent memory corruptions, and security boundary breaches when executing shell and compilation tasks in production developer loops.',
     problemStatementAr: 'تنتج نماذج التوليد البرمجي هلوسات غير قطعية وفساداً في الذاكرة واختراقاً للحدود الأمنية عند تشغيل أوامر الطرفية في بيئات التطوير الحية.',
@@ -227,73 +223,34 @@ export const DOSSIER_CASE_STUDIES: DossierCaseStudy[] = [
       { metric: 'AST Verification Latency', metricAr: 'زمن فحص الشجرة النحوية', baseline: '180 ms', petabyteResult: '16 ms', delta: '11.2x Speedup' },
     ],
     architectureDiagramType: 'seccomp_wasm_agent_boundary',
-    paperReference: {
-      venue: 'IEEE Transactions on Software Engineering & AI',
-      doi: '10.1109/TSE.2026.491028',
-      preprintUrl: '#open-preprint-cs-02',
-    },
+    status: 'DESIGN_STUDY',
   },
 ];
 
-export const NETWORK_MEMBERS: NetworkMemberNode[] = [
+// Real, in-flight work. Measured results replace the modeled design studies above as each milestone lands.
+export const RESEARCH_ROADMAP: RoadmapItem[] = [
   {
-    id: 'net-01',
-    callsign: 'NODE::BAGHDAD-01',
-    name: 'Mustafa F. (Lead Maintainer)',
-    hub: 'MENA',
-    location: 'Baghdad, IQ -> Toronto, CA',
-    specialty: 'Distributed Storage & Low-Level Kernel Engineering',
-    activeProject: 'PetaByte Engine Core (Rust / io_uring)',
-    status: 'ACTIVE_BUILD',
-    latency: '14ms',
-    verifiedSlackNode: true,
-  },
-  {
-    id: 'net-02',
-    callsign: 'NODE::BOSTON-04',
-    name: 'Dr. Sarah K.',
-    hub: 'NORTH_AMERICA',
-    location: 'Cambridge, MA (MIT CSAIL)',
-    specialty: 'Hardware Architecture & Neuromorphic Accelerators',
-    activeProject: 'Memory Hierarchy Benchmarking Suite',
-    status: 'ONLINE',
-    latency: '4ms',
-    verifiedSlackNode: true,
-  },
-  {
-    id: 'net-03',
-    callsign: 'NODE::DUBAI-09',
-    name: 'Zaid A.',
-    hub: 'MENA',
-    location: 'Dubai, UAE -> San Francisco, CA',
-    specialty: 'Multi-Agent Consensus & Model Context Protocols',
-    activeProject: 'Autonomous AST Mutation Engine',
-    status: 'DISPATCHING',
-    latency: '22ms',
-    verifiedSlackNode: true,
-  },
-  {
-    id: 'net-04',
-    callsign: 'NODE::WATERLOO-02',
-    name: 'Elena R.',
-    hub: 'NORTH_AMERICA',
-    location: 'Waterloo, ON (Systems Lab)',
-    specialty: 'SIMD Acceleration & High-Throughput Networking',
-    activeProject: 'DPDK Packet Interceptor for Zero-Copy Pipelines',
-    status: 'ONLINE',
-    latency: '8ms',
-    verifiedSlackNode: true,
-  },
-  {
-    id: 'net-05',
-    callsign: 'NODE::CAIRO-03',
-    name: 'Omar T.',
-    hub: 'MENA',
-    location: 'Cairo, EG -> Seattle, WA',
-    specialty: 'Formal Verification (TLA+) & Distributed Databases',
-    activeProject: 'Consensus Invariant Checker',
-    status: 'ACTIVE_BUILD',
-    latency: '31ms',
-    verifiedSlackNode: true,
+    id: 'rm-5g-slicing',
+    kind: 'SENIOR GRADUATION PROJECT',
+    status: 'IN_PROGRESS',
+    title: '5G Private Networks & Network Slicing on an SDR Testbed',
+    titleAr: 'شبكات الجيل الخامس الخاصة وتقطيع الشبكة على منصة راديو معرّف برمجياً',
+    summary:
+      'Building a private 5G network on software-defined radio hardware and partitioning it into isolated slices for URLLC, mMTC, and eMBB traffic classes.',
+    summaryAr:
+      'بناء شبكة جيل خامس خاصة على عتاد الراديو المعرّف برمجياً وتقسيمها إلى شرائح معزولة لفئات حركة URLLC وmMTC وeMBB.',
+    deliverables: [
+      'SDR hardware performance metrics',
+      'URLLC slice latency & reliability benchmarks',
+      'mMTC slice device-density benchmarks',
+      'eMBB slice throughput benchmarks',
+    ],
+    deliverablesAr: [
+      'مقاييس أداء عتاد الراديو المعرّف برمجياً',
+      'قياسات زمن الاستجابة والموثوقية لشريحة URLLC',
+      'قياسات كثافة الأجهزة لشريحة mMTC',
+      'قياسات معدل النقل لشريحة eMBB',
+    ],
+    resultsStatus: 'PENDING',
   },
 ];

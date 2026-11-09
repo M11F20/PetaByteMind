@@ -1,0 +1,180 @@
+name: CI/CD
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+defaults:
+  run:
+    # Explicit shell turns on pipefail, so `cmd | tee` can't mask a failing cmd.
+    shell: bash
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+env:
+  NODE_VERSION: 22
+  NEXT_TELEMETRY_DISABLED: 1
+  NEXT_PUBLIC_TURNSTILE_SITE_KEY: ${{ vars.TURNSTILE_SITE_KEY }}
+
+jobs:
+  quality:
+    name: Typecheck & lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with: { node-version: '${{ env.NODE_VERSION }}', cache: npm }
+      - run: npm ci
+      - name: Generate Next route types
+        run: npx next typegen
+      - run: npm run typecheck
+      - run: npx eslint --max-warnings=0 .
+      - name: Drizzle schema ↔ migrations in sync
+        run: |
+          npx drizzle-kit generate --name ci-drift-check
+          git diff --exit-code --stat drizzle/ || (echo "::error::Schema changed without a migration. Run npm run db:generate and commit." && exit 1)
+
+  e2e:
+    name: Playwright (EN + AR, 3 viewports)
+    needs: quality
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with: { node-version: '${{ env.NODE_VERSION }}', cache: npm }
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - run: npm run build
+      - run: npm run test:e2e
+      - if: failure()
+        uses: actions/upload-artifact@v5
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 7
+
+  worker-smoke:
+    name: Worker smoke (D1 · KV · DO · rate limits)
+    needs: quality
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with: { node-version: '${{ env.NODE_VERSION }}', cache: npm }
+      - run: npm ci
+      - run: npm run cf:build
+      - run: scripts/smoke.sh
+
+  preview:
+    name: Preview deploy
+    if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
+    needs: [e2e, worker-smoke]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+    environment:
+      name: preview
+      url: ${{ steps.upload.outputs.url }}
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+    steps:
+      - name: Check Cloudflare credentials
+        id: creds
+        run: |
+          if [[ -n "$CLOUDFLARE_API_TOKEN" && -n "$CLOUDFLARE_ACCOUNT_ID" ]]; then
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "::notice::Preview skipped: add CLOUDFLARE_API_TOKEN and CLOUDFLARE_ACCOUNT_ID repository secrets to enable PR previews."
+          fi
+      - if: steps.creds.outputs.ready == 'true'
+        uses: actions/checkout@v5
+      - if: steps.creds.outputs.ready == 'true'
+        uses: actions/setup-node@v5
+        with: { node-version: '${{ env.NODE_VERSION }}', cache: npm }
+      - if: steps.creds.outputs.ready == 'true'
+        run: npm ci
+      - if: steps.creds.outputs.ready == 'true'
+        run: npm run cf:build
+      - name: Upload preview version
+        if: steps.creds.outputs.ready == 'true'
+        id: upload
+        env:
+          TURNSTILE_SECRET_KEY: ${{ secrets.TURNSTILE_SECRET_KEY }}
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          GITHUB_TOKEN: ${{ secrets.GH_STATUS_TOKEN }}
+        run: |
+          node scripts/write-secrets-file.mjs .secrets.json
+          npx wrangler versions upload \
+            --preview-alias "pr-${{ github.event.pull_request.number }}" \
+            --message "PR #${{ github.event.pull_request.number }} @ ${GITHUB_SHA::7}" \
+            --secrets-file .secrets.json | tee upload.log
+          rm -f .secrets.json
+          url=$(grep -oE 'https://pr-[^ ]+\.workers\.dev' upload.log | head -1 || true)
+          echo "url=${url}" >> "$GITHUB_OUTPUT"
+      - name: Comment preview URL
+        if: steps.creds.outputs.ready == 'true' && steps.upload.outputs.url != ''
+        uses: actions/github-script@v8
+        with:
+          script: |
+            const url = '${{ steps.upload.outputs.url }}';
+            const marker = '<!-- pbm-preview -->';
+            const body = `${marker}\n**Preview:** ${url}\n\nCommit \`${context.sha.slice(0, 7)}\` · shares production D1/KV bindings.`;
+            const { data: comments } = await github.rest.issues.listComments({ ...context.repo, issue_number: context.issue.number });
+            const prev = comments.find((c) => c.body?.includes(marker));
+            if (prev) await github.rest.issues.updateComment({ ...context.repo, comment_id: prev.id, body });
+            else await github.rest.issues.createComment({ ...context.repo, issue_number: context.issue.number, body });
+
+  deploy:
+    name: Deploy to production
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: [e2e, worker-smoke]
+    runs-on: ubuntu-latest
+    concurrency:
+      group: production
+      cancel-in-progress: false
+    environment:
+      name: production
+      url: https://petabytemind.com
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+    steps:
+      - name: Require Cloudflare credentials
+        run: |
+          [[ -n "$CLOUDFLARE_API_TOKEN" && -n "$CLOUDFLARE_ACCOUNT_ID" ]] || {
+            echo "::error::Set CLOUDFLARE_API_TOKEN and CLOUDFLARE_ACCOUNT_ID repository secrets before deploying."; exit 1; }
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with: { node-version: '${{ env.NODE_VERSION }}', cache: npm }
+      - run: npm ci
+      - run: npm run cf:build
+      - name: Apply D1 migrations (pre-deploy)
+        # On the very first deploy the database doesn't exist yet; wrangler deploy auto-provisions it below.
+        run: npx wrangler d1 migrations apply DB --remote || echo "::warning::D1 not provisioned yet — migrating after deploy."
+      - name: Deploy Worker
+        env:
+          TURNSTILE_SECRET_KEY: ${{ secrets.TURNSTILE_SECRET_KEY }}
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          GITHUB_TOKEN: ${{ secrets.GH_STATUS_TOKEN }}
+        run: |
+          node scripts/write-secrets-file.mjs .secrets.json
+          npx wrangler deploy --secrets-file .secrets.json --message "main @ ${GITHUB_SHA::7}"
+          rm -f .secrets.json
+      - name: Apply D1 migrations (post-deploy, idempotent)
+        run: npx wrangler d1 migrations apply DB --remote
+      - name: Production health check
+        run: |
+          for path in /en /ar /api/telemetry; do
+            code=$(curl -s -o /dev/null -w '%{http_code}' "${{ vars.PRODUCTION_URL || 'https://petabytemind.com' }}${path}")
+            echo "${path} → ${code}"
+            [[ "$code" == "200" ]] || exit 1
+          done

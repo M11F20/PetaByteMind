@@ -3,12 +3,14 @@
 import React from 'react';
 import { useWorkspace } from '@/context/WorkspaceContext';
 import { useDirection } from '@/context/DirectionContext';
-import { WorkspaceId } from '@/types';
+import { useLiveTelemetry } from '@/context/LiveTelemetryContext';
+import type { WorkspaceId } from '@/types';
 import { Terminal, Database, FileText, Globe, Languages, Activity } from 'lucide-react';
 
 export function CommandRail() {
   const { activeWorkspace, setActiveWorkspace } = useWorkspace();
   const { language, toggleLanguage, t } = useDirection();
+  const { telemetry } = useLiveTelemetry();
 
   const navItems: Array<{
     id: WorkspaceId;
@@ -58,7 +60,7 @@ export function CommandRail() {
             </span>
           </div>
           <span className="font-mono text-[9px] text-ash-muted hidden md:inline">
-            v1.0.4
+            v{process.env.NEXT_PUBLIC_APP_VERSION}
           </span>
         </div>
 
@@ -77,6 +79,8 @@ export function CommandRail() {
                     : 'text-ash-muted hover:text-signal-pure hover:bg-void/40 border border-transparent'
                 }`}
                 title={t(item.labelKey)}
+                data-testid={`nav-${item.id}`}
+                aria-current={isActive ? 'page' : undefined}
               >
                 {/* Active indicator bar */}
                 {isActive && (
@@ -108,6 +112,7 @@ export function CommandRail() {
           onClick={toggleLanguage}
           className="w-full flex items-center justify-between px-2.5 py-2 bg-void hover:bg-slate-border/50 border border-slate-border text-signal-pure font-mono text-xs transition-colors"
           title="Toggle LTR / RTL Language (English / Arabic)"
+          data-testid="lang-toggle"
         >
           <div className="flex items-center gap-2">
             <Languages className="w-3.5 h-3.5 text-cyan-hyper" />
@@ -126,7 +131,9 @@ export function CommandRail() {
             <Activity className="w-2.5 h-2.5 text-cyan-hyper animate-pulse" />
             <span>RTT</span>
           </span>
-          <span className="text-signal-pure">14ms (LOCKED)</span>
+          <span className="text-signal-pure tabular-nums">
+            {telemetry?.edge.rttMs != null ? `${telemetry.edge.rttMs}ms @ ${telemetry.edge.colo}` : '—'}
+          </span>
         </div>
       </div>
     </aside>

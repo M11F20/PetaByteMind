@@ -3,22 +3,26 @@
 import React from 'react';
 import { useWorkspace } from '@/context/WorkspaceContext';
 import { useDirection } from '@/context/DirectionContext';
-import { SYSTEM_PILLARS } from '@/data/mockData';
+import { SYSTEM_PILLARS } from '@/data/content';
+import { useLiveTelemetry } from '@/context/LiveTelemetryContext';
+import { formatVital, vitalIsGood } from '@/lib/format';
 import { ReticleCorner } from './ReticleCorner';
-import { Activity, ShieldAlert, Cpu, ArrowUpRight, Terminal } from 'lucide-react';
+import { Activity, Cpu, ArrowUpRight, Terminal } from 'lucide-react';
 
 export function TelemetryInspector() {
   const { activePillarNode, setActiveWorkspace } = useWorkspace();
   const { t, language } = useDirection();
+  const { telemetry } = useLiveTelemetry();
+  const vital = (m: string) => telemetry?.vitals.find((v) => v.metric === m);
 
   const node = SYSTEM_PILLARS.find((p) => p.id === activePillarNode) || SYSTEM_PILLARS[0];
 
   return (
-    <div className="relative w-full h-full bg-void border border-slate-border p-4 flex flex-col justify-between overflow-hidden select-none">
+    <div className="relative w-full h-full bg-void border border-slate-border p-4 flex flex-col justify-between overflow-y-auto select-none">
       <ReticleCorner position="top-left" label="INSP.01 // METRICS" />
-      <ReticleCorner position="top-right" label="STATUS: SYNC" />
+      <ReticleCorner position="top-right" label={telemetry ? `EDGE: ${telemetry.edge.colo}` : 'EDGE: ---'} />
       <ReticleCorner position="bottom-left" label="CHANNEL: RX-02" />
-      <ReticleCorner position="bottom-right" label="REV: 1.0.4" />
+      <ReticleCorner position="bottom-right" label={`REV: ${process.env.NEXT_PUBLIC_APP_VERSION}`} />
 
       {/* Panel Header */}
       <div>
@@ -30,7 +34,7 @@ export function TelemetryInspector() {
             </span>
           </div>
           <span className="font-mono text-[10px] text-cyan-hyper px-1.5 py-0.5 bg-graphite border border-slate-border">
-            {node.index} // ACTIVE
+            {node.index}{' // ACTIVE'}
           </span>
         </div>
 
@@ -89,6 +93,22 @@ export function TelemetryInspector() {
         </div>
       </div>
 
+      {/* Live edge + real-user telemetry: every value here is measured, none hardcoded */}
+      <div className="mb-3 border border-slate-border bg-graphite/40 p-2 font-mono text-[10px]" data-testid="live-telemetry">
+        <div className="text-[9px] text-ash-muted uppercase tracking-wider mb-1.5">{t('inspector.live')}</div>
+        <div className="grid grid-cols-3 gap-1.5 mb-2">
+          <LiveCell label="POP" value={telemetry?.edge.colo ?? '—'} />
+          <LiveCell label="RTT" value={telemetry?.edge.rttMs != null ? `${telemetry.edge.rttMs}ms` : '—'} />
+          <LiveCell label="PROTO" value={telemetry?.edge.httpProtocol?.replace('HTTP/', 'H') ?? '—'} />
+        </div>
+        <div className="text-[9px] text-ash-muted uppercase tracking-wider mb-1.5">{t('inspector.rum')}</div>
+        <div className="grid grid-cols-3 gap-1.5">
+          {(['LCP', 'INP', 'CLS'] as const).map((m) => (
+            <LiveCell key={m} label={m} value={formatVital(vital(m))} good={vitalIsGood(vital(m))} />
+          ))}
+        </div>
+      </div>
+
       {/* Artifact Link & Action Jump */}
       <div className="border-t border-slate-border pt-3 space-y-2">
         <div className="flex items-center justify-between text-[10px] font-mono text-ash-muted">
@@ -108,6 +128,18 @@ export function TelemetryInspector() {
           </span>
           <ArrowUpRight className="w-3.5 h-3.5 text-ash-muted" />
         </button>
+      </div>
+    </div>
+  );
+}
+
+function LiveCell({ label, value, good = null }: { label: string; value: string; good?: boolean | null }) {
+  const tone = good === null ? 'text-signal-pure' : good ? 'text-cyan-hyper' : 'text-amber-400';
+  return (
+    <div className="bg-void border border-slate-border px-1.5 py-1">
+      <div className="text-[8px] text-ash-muted">{label}</div>
+      <div className={`tabular-nums font-semibold ${tone}`} data-telemetry>
+        {value}
       </div>
     </div>
   );

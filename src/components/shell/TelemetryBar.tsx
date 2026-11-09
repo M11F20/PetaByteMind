@@ -2,12 +2,20 @@
 
 import React from 'react';
 import { useWorkspace } from '@/context/WorkspaceContext';
+import { useClock } from '@/context/ClockContext';
+import { useLiveTelemetry } from '@/context/LiveTelemetryContext';
 import { useDirection } from '@/context/DirectionContext';
-import { Search, CheckCircle2, Radio, Terminal, Slash } from 'lucide-react';
+import { Search, CheckCircle2, XCircle, Loader2, Radio, Terminal, MapPin } from 'lucide-react';
 
 export function TelemetryBar() {
-  const { activeWorkspace, toggleCommandPalette, liveFps, smpteTimecode } = useWorkspace();
+  const { activeWorkspace, toggleCommandPalette } = useWorkspace();
+  const { timecode: smpteTimecode } = useClock();
   const { t, language } = useDirection();
+  const { build, presence, link, telemetry } = useLiveTelemetry();
+
+  const ci = build?.ci;
+  const buildState = !ci ? 'UNKNOWN' : ci.status !== 'completed' ? 'RUNNING' : ci.conclusion === 'success' ? 'PASSING' : 'FAILING';
+  const BuildIcon = buildState === 'FAILING' ? XCircle : buildState === 'RUNNING' ? Loader2 : CheckCircle2;
 
   const workspacePaths: Record<string, string> = {
     cmd: '~/petabytemind/cmd-center',
@@ -35,24 +43,37 @@ export function TelemetryBar() {
         <span className="text-slate-border hidden md:inline">|</span>
 
         {/* Live Build Status */}
-        <div className="hidden lg:flex items-center gap-1.5 text-[11px] text-ash-muted">
-          <CheckCircle2 className="w-3 h-3 text-cyan-hyper" />
-          <span>{t('telemetry.build')}</span>
-        </div>
+        <a
+          href={ci?.url ?? build?.commitUrl ?? 'https://github.com/M11F20/PetaByteMind'}
+          target="_blank"
+          rel="noreferrer"
+          title={build ? `${build.shortSha} — ${build.message}` : undefined}
+          className="hidden lg:flex items-center gap-1.5 text-[11px] text-ash-muted hover:text-signal-pure"
+          data-testid="build-status"
+        >
+          <BuildIcon className={`w-3 h-3 ${buildState === 'FAILING' ? 'text-red-400' : 'text-cyan-hyper'} ${buildState === 'RUNNING' ? 'animate-spin' : ''}`} />
+          <span>
+            {t('telemetry.build')}: {buildState}{' // '}{build?.shortSha ?? '-------'}
+          </span>
+        </a>
       </div>
 
       {/* Center: Live Community & Module Telemetry */}
       <div className="hidden xl:flex items-center gap-5 text-[11px] text-ash-muted">
         <div className="flex items-center gap-1.5">
-          <span className="w-1.5 h-1.5 bg-cyan-hyper animate-pulse" />
-          <span>{t('telemetry.modules')}</span>
+          <MapPin className="w-3 h-3 text-cyan-hyper" />
+          <span>
+            {t('telemetry.edge')}: <span className="text-signal-pure">{telemetry?.edge.colo ?? '---'}</span>
+          </span>
         </div>
 
         <span className="text-slate-border">|</span>
 
         <div className="flex items-center gap-1.5">
-          <Radio className="w-3 h-3 text-cyan-hyper" />
-          <span>{t('telemetry.slack')}</span>
+          <Radio className={`w-3 h-3 ${link === 'live' ? 'text-cyan-hyper' : 'text-ash-muted'}`} />
+          <span>
+            {t('telemetry.live')}: <span className="text-signal-pure">{link === 'live' && presence ? presence.total : '—'}</span> {t('telemetry.online')}
+          </span>
         </div>
       </div>
 

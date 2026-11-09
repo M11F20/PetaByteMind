@@ -2,66 +2,26 @@
 
 import React, { useState } from 'react';
 import { useDirection } from '@/context/DirectionContext';
-import { DOSSIER_CASE_STUDIES } from '@/data/mockData';
+import { DOSSIER_CASE_STUDIES, RESEARCH_ROADMAP } from '@/data/content';
 import { ReticleCorner } from '@/components/hud/ReticleCorner';
 import {
   GraduationCap,
-  Award,
   FileCheck2,
-  ExternalLink,
   ChevronRight,
-  TrendingDown,
-  TrendingUp,
   BookOpen,
   Microscope,
 } from 'lucide-react';
 
 export function DossierWorkspace() {
   const { t, language } = useDirection();
-  const [activeTab, setActiveTab] = useState<'case_studies' | 'publications'>('case_studies');
-
-  const publications = [
-    {
-      id: 'pub-01',
-      year: '2026',
-      venue: 'ACM SIGOPS / Operating Systems Review (Preprint)',
-      title: 'Zero-Copy Ring Buffering and AVX-512 Stream Partitioning for High-Throughput Log Engines',
-      authors: 'M. Faisal, S. K. Chen, et al.',
-      doi: '10.1145/3812901.petabyte.dedup',
-      codeUrl: 'https://github.com/M11F20/PetaByteMind',
-      type: 'CONFERENCE PAPER',
-      status: 'UNDER REVIEW',
-    },
-    {
-      id: 'pub-02',
-      year: '2025',
-      venue: 'IEEE Transactions on Software Engineering & Program Synthesis',
-      title: 'Deterministic Seccomp-BPF Verification Sandboxes for Speculative Agentic Tool Invocations',
-      authors: 'M. Faisal, E. Rostova, Z. Al-Mansoor',
-      doi: '10.1109/TSE.2026.491028',
-      codeUrl: 'https://github.com/M11F20/PetaByteMind',
-      type: 'JOURNAL ARTICLE',
-      status: 'PUBLISHED',
-    },
-    {
-      id: 'pub-03',
-      year: '2025',
-      venue: 'USENIX FAST Workshop on Distributed Memory Architectures',
-      title: 'Evaluating NUMA Sockets Contention and Cache-Line Bouncing Under 100GbE Workloads',
-      authors: 'M. Faisal, et al.',
-      doi: '10.5555/usenix.fast.2025.04',
-      codeUrl: 'https://github.com/M11F20/PetaByteMind',
-      type: 'WORKSHOP PROCEEDINGS',
-      status: 'ACCEPTED',
-    },
-  ];
+  const [activeTab, setActiveTab] = useState<'case_studies' | 'roadmap'>('case_studies');
 
   return (
     <div className="w-full h-full flex flex-col space-y-4 p-3 md:p-4 overflow-y-auto">
       {/* Dossier Header & Admissions Target Notice */}
       <section className="relative w-full bg-void border border-slate-border p-4 select-none">
-        <ReticleCorner position="top-left" label="DOSSIER.01 // ACADEMIC" />
-        <ReticleCorner position="top-right" label="CLEARANCE: VERIFIED" />
+        <ReticleCorner position="top-left" label="BLUEPRINTS.01 // DESIGN" />
+        <ReticleCorner position="top-right" label="STATUS: DESIGN PHASE" />
 
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
           <div>
@@ -86,8 +46,8 @@ export function DossierWorkspace() {
               <span className="text-cyan-hyper">DISTRIBUTED SYSTEMS & KERNEL I/O</span>
             </div>
             <div className="px-2.5 py-1.5 bg-graphite border border-slate-border text-signal-pure">
-              <span className="text-ash-muted">ACADEMIC VENUE: </span>
-              <span className="text-signal-pure">IEEE / ACM SIGOPS</span>
+              <span className="text-ash-muted">NEXT MILESTONE: </span>
+              <span className="text-signal-pure">5G NETWORK SLICING TESTBED</span>
             </div>
           </div>
         </div>
@@ -109,9 +69,9 @@ export function DossierWorkspace() {
           </button>
 
           <button
-            onClick={() => setActiveTab('publications')}
+            onClick={() => setActiveTab('roadmap')}
             className={`px-3 py-1.5 font-mono text-xs tracking-wider uppercase transition-colors ${
-              activeTab === 'publications'
+              activeTab === 'roadmap'
                 ? 'bg-graphite text-signal-pure border border-cyan-hyper shadow-cyan-subtle'
                 : 'text-ash-muted hover:text-signal-pure border border-slate-border'
             }`}
@@ -141,7 +101,7 @@ export function DossierWorkspace() {
                     <span className="px-1.5 py-0.5 bg-void border border-cyan-hyper text-cyan-hyper font-bold">
                       {study.index}
                     </span>
-                    <span>TARGET: {study.targetCommittee}</span>
+                    <span>AREA: {study.targetCommittee}</span>
                   </div>
                   <h3 className="text-sm sm:text-base font-bold text-signal-pure uppercase">
                     {language === 'ar' ? study.titleAr : study.title}
@@ -149,8 +109,8 @@ export function DossierWorkspace() {
                 </div>
 
                 <div className="text-end font-mono text-[10px] text-ash-muted shrink-0">
-                  <div className="text-cyan-hyper font-semibold">{study.paperReference.venue}</div>
-                  <div>DOI: {study.paperReference.doi}</div>
+                  <div className="text-cyan-hyper font-semibold">ARCHITECTURE STUDY</div>
+                  <div>{study.leadResearchArea}</div>
                 </div>
               </div>
 
@@ -160,7 +120,7 @@ export function DossierWorkspace() {
                 <div className="p-4 bg-void hover:bg-graphite/25 transition-colors duration-150">
                   <div className="text-[10px] font-mono text-ash-muted uppercase tracking-wider mb-1 flex items-center gap-1.5 select-none">
                     <span className="w-1.5 h-1.5 bg-red-400" />
-                    <span>EMPIRICAL PROBLEM STATEMENT</span>
+                    <span>PROBLEM STATEMENT</span>
                   </div>
                   <p className="text-xs font-sans text-signal-pure/90 leading-relaxed">
                     {language === 'ar' ? study.problemStatementAr : study.problemStatement}
@@ -171,7 +131,7 @@ export function DossierWorkspace() {
                 <div className="p-4 bg-graphite/30 hover:bg-graphite/50 transition-colors duration-150">
                   <div className="text-[10px] font-mono text-ash-muted uppercase tracking-wider mb-1 flex items-center gap-1.5 select-none">
                     <span className="w-1.5 h-1.5 bg-cyan-hyper" />
-                    <span>ENGINEERED SYSTEM SOLUTION</span>
+                    <span>PROPOSED ARCHITECTURE</span>
                   </div>
                   <p className="text-xs font-sans text-signal-pure/90 leading-relaxed">
                     {language === 'ar' ? study.systemSolutionAr : study.systemSolution}
@@ -182,7 +142,7 @@ export function DossierWorkspace() {
               {/* Empirical Benchmark Matrix */}
               <div className="p-4 bg-void select-none">
                 <div className="text-[10px] font-mono text-ash-muted uppercase tracking-wider mb-3">
-                  RIGOROUS MEASURED BENCHMARKS (PRODUCTION WORKLOADS)
+                  {t('dossier.benchmarks')}{' // MODELED, NOT YET MEASURED'}
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
@@ -205,7 +165,7 @@ export function DossierWorkspace() {
                       </div>
 
                       <div className="pt-1.5 border-t border-slate-border flex items-center justify-between text-[10px] font-mono text-cyan-hyper font-semibold">
-                        <span>DELTA</span>
+                        <span>TARGET Δ</span>
                         <span>{bm.delta}</span>
                       </div>
                     </div>
@@ -217,54 +177,48 @@ export function DossierWorkspace() {
         </section>
       )}
 
-      {/* View 2: IEEE / ACM Publications Timeline */}
-      {activeTab === 'publications' && (
-        <section className="bg-void border border-slate-border p-4 select-text">
+      {/* View 2: Research Roadmap — real, in-flight work only */}
+      {activeTab === 'roadmap' && (
+        <section className="bg-void border border-slate-border p-4 select-text" data-testid="research-roadmap">
           <div className="text-xs font-mono text-ash-muted mb-4 flex items-center justify-between border-b border-slate-border pb-2 select-none">
-            <span className="font-bold text-signal-pure uppercase">
-              PEER-REVIEWED ARCHIVE & TECHNICAL DISPATCHES
-            </span>
-            <span>STANDARD: IEEE / ACM CITATION FORMAT</span>
+            <span className="font-bold text-signal-pure uppercase">{t('dossier.publications')}</span>
+            <span>MEASURED RESULTS REPLACE DESIGN STUDIES ON COMPLETION</span>
           </div>
 
           <div className="space-y-4">
-            {publications.map((pub, idx) => (
-              <div
-                key={pub.id}
-                className="p-4 bg-graphite/60 border border-slate-border hover:border-cyan-hyper transition-colors"
-              >
+            {RESEARCH_ROADMAP.map((item) => (
+              <div key={item.id} className="p-4 bg-graphite/60 border border-slate-border hover:border-cyan-hyper transition-colors">
                 <div className="flex flex-wrap items-center justify-between gap-2 text-[10px] font-mono text-ash-muted mb-1 select-none">
-                  <div className="flex items-center gap-2">
-                    <span className="px-1.5 py-0.5 bg-void border border-slate-border text-cyan-hyper font-bold">
-                      [{pub.year}]
-                    </span>
-                    <span className="text-signal-pure font-semibold">{pub.type}</span>
-                  </div>
+                  <span className="text-signal-pure font-semibold">{item.kind}</span>
                   <span className="px-2 py-0.5 bg-void border border-cyan-hyper text-cyan-hyper font-semibold">
-                    {pub.status}
+                    {item.status.replace('_', ' ')}
                   </span>
                 </div>
 
                 <h4 className="text-xs sm:text-sm font-mono font-bold text-signal-pure mb-1.5 leading-snug">
-                  {pub.title}
+                  {language === 'ar' ? item.titleAr : item.title}
                 </h4>
+                <p className="text-xs font-sans text-ash-muted mb-3 leading-relaxed">
+                  {language === 'ar' ? item.summaryAr : item.summary}
+                </p>
 
-                <div className="text-xs font-sans text-ash-muted mb-3">
-                  <span className="text-signal-pure font-semibold">{pub.authors}</span> — In{' '}
-                  <span className="italic text-signal-pure/80">{pub.venue}</span>
-                </div>
+                <ul className="space-y-1 text-[11px] font-sans text-signal-pure/90 mb-3">
+                  {(language === 'ar' ? item.deliverablesAr : item.deliverables).map((d) => (
+                    <li key={d} className="flex items-start gap-2">
+                      <ChevronRight className="w-3 h-3 mt-0.5 text-cyan-hyper shrink-0 rtl:rotate-180" />
+                      <span>{d}</span>
+                    </li>
+                  ))}
+                </ul>
 
-                <div className="flex flex-wrap items-center justify-between gap-2 text-[10px] font-mono pt-2 border-t border-slate-border select-none">
-                  <span className="text-ash-muted">DOI: {pub.doi}</span>
-                  <a
-                    href={pub.codeUrl}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="flex items-center gap-1 text-cyan-hyper hover:underline"
-                  >
-                    <span>REPLICATION CODEBASE</span>
-                    <ExternalLink className="w-3 h-3" />
-                  </a>
+                <div className="flex items-center justify-between gap-2 text-[10px] font-mono pt-2 border-t border-slate-border select-none">
+                  <span className="text-ash-muted">
+                    RESULTS: <span className="text-signal-pure">{item.resultsStatus}</span>
+                  </span>
+                  <span className="flex items-center gap-1 text-ash-muted">
+                    <FileCheck2 className="w-3 h-3 text-cyan-hyper" />
+                    <span>BENCHMARKS PUBLISH HERE WHEN MEASURED</span>
+                  </span>
                 </div>
               </div>
             ))}

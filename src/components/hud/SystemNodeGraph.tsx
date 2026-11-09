@@ -3,10 +3,9 @@
 import React, { useState } from 'react';
 import { useWorkspace } from '@/context/WorkspaceContext';
 import { useDirection } from '@/context/DirectionContext';
-import { SYSTEM_PILLARS } from '@/data/mockData';
-import { SystemPillarId } from '@/types';
+import { SYSTEM_PILLARS } from '@/data/content';
+import type { SystemPillarId } from '@/types';
 import { ReticleCorner } from './ReticleCorner';
-import { Cpu, Network, Layers, Sparkles } from 'lucide-react';
 
 export function SystemNodeGraph() {
   const { activePillarNode, setActivePillarNode } = useWorkspace();
@@ -15,13 +14,6 @@ export function SystemNodeGraph() {
 
   const activeOrHovered = hoveredNode || activePillarNode;
   const currentPillar = SYSTEM_PILLARS.find((p) => p.id === activeOrHovered) || SYSTEM_PILLARS[0];
-
-  const nodeIcons: Record<SystemPillarId, React.ReactNode> = {
-    systems_philosophy: <Layers className="w-3.5 h-3.5" />,
-    fullstack_architecture: <Network className="w-3.5 h-3.5" />,
-    vibe_coding: <Sparkles className="w-3.5 h-3.5" />,
-    hardware_mechanics: <Cpu className="w-3.5 h-3.5" />,
-  };
 
   // Pre-calculated node coordinates for SVG viewBox 0 0 1000 600
   const nodeCoords: Record<SystemPillarId, { x: number; y: number }> = {
@@ -233,7 +225,7 @@ export function SystemNodeGraph() {
       {/* Footer Navigation Bar */}
       <div className="flex items-center justify-between border-t border-slate-border pt-2 text-[10px] font-mono text-ash-muted z-10">
         <div className="flex items-center gap-3">
-          <span>ACTIVE: <span className="text-cyan-hyper">{currentPillar.index} // {currentPillar.label}</span></span>
+          <span>ACTIVE: <span className="text-cyan-hyper">{currentPillar.index}{' // '}{currentPillar.label}</span></span>
         </div>
         <div className="flex items-center gap-2">
           <span className="w-2 h-2 rounded-none bg-cyan-hyper inline-block" />

@@ -3,18 +3,16 @@
 import React, { useState } from 'react';
 import { useWorkspace } from '@/context/WorkspaceContext';
 import { useDirection } from '@/context/DirectionContext';
-import { VAULT_SNIPPETS } from '@/data/mockData';
+import { VAULT_SNIPPETS } from '@/data/content';
 import { ComplexityLevel } from '@/types';
 import { ReticleCorner } from '@/components/hud/ReticleCorner';
 import {
   Sliders,
   Copy,
   Check,
-  Code2,
   FileCode,
   Layers,
   Terminal,
-  ArrowRight,
 } from 'lucide-react';
 
 export function VaultWorkspace() {
