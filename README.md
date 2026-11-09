@@ -111,22 +111,22 @@ npx wrangler d1 execute petabytemind --remote --command "INSERT INTO members (ha
 | Stage | Owner | What runs |
 | :--- | :--- | :--- |
 | Quality gate | GitHub Actions (`.github/workflows/ci.yml`) | tsc, eslint (0 warnings), schema↔migration drift, Playwright EN/AR × 3 viewports, real-Worker smoke test |
-| Preview | Cloudflare Workers Builds → `npm run cf:ci` | Any non-`main` branch: OpenNext build → `wrangler versions upload --preview-alias <branch>` (preview URL commented on the PR). Never touches production |
-| Production | Cloudflare Workers Builds → `npm run cf:ci` | `main`: OpenNext build → D1 migrations → deploy → D1 migrations (idempotent) |
+| Preview | Cloudflare Workers Builds (default `npx wrangler versions upload`) | Non-`main` branches: build hook → preview version. Never touches production or the DB schema |
+| Production | Cloudflare Workers Builds (default `npx wrangler deploy`) | `main`: build hook → ensure D1 exists → migrations → deploy |
+
+The build hook (`wrangler.jsonc` → `build.command` → `scripts/build-worker.sh`) makes Cloudflare's **default** build settings work with no dashboard commands. `cloudflare/open-next.config.ts` lives outside the repo root on purpose: a root-level `open-next.config.*` makes wrangler hand `deploy` off to `opennextjs-cloudflare deploy`, which skips the build.
 
 **One-time Cloudflare setup** (Workers & Pages → `petabytemind` → Settings):
 
 | Where | Setting | Value |
 | :--- | :--- | :--- |
-| Build | Build command | *(empty)* |
-| Build | Deploy command | `npm run cf:ci` |
-| Build | Non-production branch deploy command | `npm run cf:ci` |
+| Build | Build / deploy commands | Defaults (build empty, `npx wrangler deploy`, `npx wrangler versions upload`) |
 | Build → Variables | `NEXT_PUBLIC_TURNSTILE_SITE_KEY` | Turnstile site key (build-time) |
 | Variables & Secrets | `TURNSTILE_SECRET_KEY` | Turnstile secret (intake returns 503 until set) |
 | Variables & Secrets | `SLACK_WEBHOOK_URL` | *(optional)* Slack Incoming Webhook |
 | Variables & Secrets | `GITHUB_TOKEN` | *(optional)* read-only token for higher GitHub API limits |
 
-D1 and KV are **auto-provisioned** on the first deploy, so there are no IDs to copy. In GitHub, mark the `CI` jobs as required checks on `main`.
+In GitHub, mark the `CI` jobs as required checks on `main`.
 
 ### Keyboard Shortcuts
 - `Cmd + K` or `Ctrl + K`: Open Command Palette / Dispatch Protocol
