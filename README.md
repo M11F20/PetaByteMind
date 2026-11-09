@@ -106,21 +106,27 @@ npx wrangler d1 execute petabytemind --remote --command "UPDATE intake_requests 
 npx wrangler d1 execute petabytemind --remote --command "INSERT INTO members (handle,display_name,location,hub,discipline,project,project_url,approved_at) VALUES ('handle','Name','Baghdad, IQ','MENA','Distributed Systems','Project','https://github.com/...',unixepoch()*1000)"
 ```
 
-### CI/CD (`.github/workflows/ci.yml`)
-`quality` (tsc, eslint with zero warnings, schema/migration drift check) → `e2e` + `worker-smoke` → **preview** (PRs: `wrangler versions upload --preview-alias pr-N`, URL posted as a comment) or **deploy** (main: D1 migrations, `wrangler deploy`, health check).
+### CI/CD
 
-**One-time setup:**
-
-| GitHub setting | Name | Value |
+| Stage | Owner | What runs |
 | :--- | :--- | :--- |
-| Secret | `CLOUDFLARE_API_TOKEN` | Token with *Workers Scripts, D1, Workers KV, Workers Routes: Edit* |
-| Secret | `CLOUDFLARE_ACCOUNT_ID` | Your account ID |
-| Secret | `TURNSTILE_SECRET_KEY` | Turnstile widget secret |
-| Secret | `SLACK_WEBHOOK_URL` | *(optional)* Slack Incoming Webhook |
-| Secret | `GH_STATUS_TOKEN` | *(optional)* fine-grained read-only token for higher GitHub API limits |
-| Variable | `TURNSTILE_SITE_KEY` | Turnstile widget site key (hostname: petabytemind.com) |
+| Quality gate | GitHub Actions (`.github/workflows/ci.yml`) | tsc, eslint (0 warnings), schema↔migration drift, Playwright EN/AR × 3 viewports, real-Worker smoke test |
+| Preview | Cloudflare Workers Builds → `npm run cf:ci` | Any non-`main` branch: OpenNext build → `wrangler versions upload --preview-alias <branch>` (preview URL commented on the PR). Never touches production |
+| Production | Cloudflare Workers Builds → `npm run cf:ci` | `main`: OpenNext build → D1 migrations → deploy → D1 migrations (idempotent) |
 
-D1 and KV are **auto-provisioned** on the first `wrangler deploy`. No IDs to copy.
+**One-time Cloudflare setup** (Workers & Pages → `petabytemind` → Settings):
+
+| Where | Setting | Value |
+| :--- | :--- | :--- |
+| Build | Build command | *(empty)* |
+| Build | Deploy command | `npm run cf:ci` |
+| Build | Non-production branch deploy command | `npm run cf:ci` |
+| Build → Variables | `NEXT_PUBLIC_TURNSTILE_SITE_KEY` | Turnstile site key (build-time) |
+| Variables & Secrets | `TURNSTILE_SECRET_KEY` | Turnstile secret (intake returns 503 until set) |
+| Variables & Secrets | `SLACK_WEBHOOK_URL` | *(optional)* Slack Incoming Webhook |
+| Variables & Secrets | `GITHUB_TOKEN` | *(optional)* read-only token for higher GitHub API limits |
+
+D1 and KV are **auto-provisioned** on the first deploy, so there are no IDs to copy. In GitHub, mark the `CI` jobs as required checks on `main`.
 
 ### Keyboard Shortcuts
 - `Cmd + K` or `Ctrl + K`: Open Command Palette / Dispatch Protocol

@@ -26,4 +26,3 @@ blob-report/
 # OS
 .DS_Store
 Thumbs.db
-.secrets.json

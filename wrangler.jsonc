@@ -46,9 +46,9 @@
   "vars": {
     "GITHUB_REPO": "M11F20/PetaByteMind",
     "GITHUB_BRANCH": "main"
-  },
-  // SLACK_WEBHOOK_URL and GITHUB_TOKEN are optional secrets (see src/types/env.d.ts).
-  "secrets": {
-    "required": ["TURNSTILE_SECRET_KEY"]
   }
+  // Runtime secrets (Dashboard → Worker → Settings → Variables & Secrets), all typed in src/types/env.d.ts:
+  //   TURNSTILE_SECRET_KEY  — intake returns 503 until set (not `required`, so deploys never block on it)
+  //   SLACK_WEBHOOK_URL     — optional intake notifications
+  //   GITHUB_TOKEN          — optional, raises GitHub API rate limit
 }
