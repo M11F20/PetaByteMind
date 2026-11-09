@@ -12,10 +12,11 @@
     "cf:build": "opennextjs-cloudflare build",
     "cf:typegen": "wrangler types --env-interface CloudflareEnv cloudflare-env.d.ts",
     "preview": "opennextjs-cloudflare build && wrangler dev",
-    "deploy": "opennextjs-cloudflare build && opennextjs-cloudflare deploy",
     "db:generate": "drizzle-kit generate",
     "db:migrate:local": "wrangler d1 migrations apply DB --local",
-    "db:migrate:remote": "wrangler d1 migrations apply DB --remote"
+    "db:migrate:remote": "wrangler d1 migrations apply DB --remote",
+    "cf:ci": "bash scripts/cf-ci.sh",
+    "deploy": "bash scripts/cf-ci.sh"
   },
   "repository": {
     "type": "git",
