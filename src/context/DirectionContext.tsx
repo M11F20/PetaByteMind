@@ -1,6 +1,7 @@
 'use client';
 
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { Language, Direction } from '@/types';
 
 interface DirectionContextValue {
@@ -19,14 +20,15 @@ const translations: Record<Language, Record<string, string>> = {
     'nav.vault': '02 VAULT',
     'nav.vault_label': 'The Knowledge Vault',
     'nav.dossier': '03 DOSSIER',
-    'nav.dossier_label': 'Engineering Dossier',
+    'nav.dossier_label': 'Systems Blueprints',
     'nav.network': '04 NETWORK',
     'nav.network_label': 'The Global Network',
     
     // Telemetry
-    'telemetry.build': 'BUILD: PASSING // v1.0.4',
-    'telemetry.slack': 'SLACK: 1,420 NODES ONLINE',
-    'telemetry.modules': 'MODULES: 24 ACTIVE',
+    'telemetry.build': 'BUILD',
+    'telemetry.live': 'LIVE',
+    'telemetry.online': 'ONLINE',
+    'telemetry.edge': 'EDGE',
     'telemetry.rec': 'REC',
     'telemetry.search_hint': 'PRESS CMD+K TO DISPATCH',
 
@@ -45,8 +47,10 @@ const translations: Record<Language, Record<string, string>> = {
     'map.click_hint': 'CLICK NODE TO INSPECT TELEMETRY',
     'inspector.title': 'NODE TELEMETRY INSPECTOR',
     'inspector.complexity': 'COMPLEXITY INDEX',
-    'inspector.latency': 'BENCHMARK LATENCY',
+    'inspector.latency': 'LATENCY TARGET',
     'inspector.stack': 'CORE RUNTIME STACK',
+    'inspector.live': 'LIVE EDGE TELEMETRY // THIS SESSION',
+    'inspector.rum': 'REAL-USER P75 // 7 DAYS',
     'inspector.audience': 'INTENDED RECIPIENT',
     'inspector.artifact': 'ARTIFACT LINK',
 
@@ -62,12 +66,12 @@ const translations: Record<Language, Record<string, string>> = {
     'vault.code_snapshot': 'TIMESTAMPED KERNEL SNAPSHOT',
 
     // Dossier
-    'dossier.title': 'ENGINEERING DOSSIER',
-    'dossier.subtitle': 'Academic research portfolio, peer-reviewed benchmarks, and institutional credentials for Graduate Admissions & Principal R&D Labs.',
-    'dossier.target': 'PREPARED FOR: NA GRADUATE COMMITTEES & SENIOR RESEARCH DIRECTORS',
-    'dossier.case_studies': 'SYSTEMS CASE STUDIES',
-    'dossier.benchmarks': 'EMPIRICAL BENCHMARKS',
-    'dossier.publications': 'IEEE / ACM CITATION TIMELINE',
+    'dossier.title': 'SYSTEMS BLUEPRINTS',
+    'dossier.subtitle': 'Architecture studies with modeled design targets. Each study is replaced with measured results as the underlying hardware work completes.',
+    'dossier.target': 'DESIGN PHASE // MODELED TARGETS, NOT PUBLISHED RESULTS',
+    'dossier.case_studies': 'ARCHITECTURE STUDIES',
+    'dossier.benchmarks': 'DESIGN TARGETS',
+    'dossier.publications': 'RESEARCH ROADMAP',
 
     // Network
     'network.title': 'THE GLOBAL NETWORK',
@@ -75,6 +79,8 @@ const translations: Record<Language, Record<string, string>> = {
     'network.intake_title': 'SLACK INTAKE PIPELINE PROTOCOL',
     'network.spotlights': 'ACTIVE CORRIDOR BUILD SPOTLIGHTS',
     'network.verify_handle': 'VERIFY HANDLE & DISPATCH',
+    'network.presence': 'LIVE EDGE PRESENCE',
+    'network.no_members': 'Spotlights publish once members are verified. Be the first: submit your handle.',
   },
   ar: {
     // Navigation
@@ -83,14 +89,15 @@ const translations: Record<Language, Record<string, string>> = {
     'nav.vault': '02 VAULT',
     'nav.vault_label': 'خزينة المعرفة',
     'nav.dossier': '03 DOSSIER',
-    'nav.dossier_label': 'الملف الهندسي الأكاديمي',
+    'nav.dossier_label': 'المخططات المعمارية للنظم',
     'nav.network': '04 NETWORK',
     'nav.network_label': 'شبكة المهندسين',
     
     // Telemetry (Labels in Latin/English, descriptions adapted)
-    'telemetry.build': 'BUILD: PASSING // v1.0.4',
-    'telemetry.slack': 'SLACK: 1,420 NODES ONLINE',
-    'telemetry.modules': 'MODULES: 24 ACTIVE',
+    'telemetry.build': 'BUILD',
+    'telemetry.live': 'LIVE',
+    'telemetry.online': 'ONLINE',
+    'telemetry.edge': 'EDGE',
     'telemetry.rec': 'REC',
     'telemetry.search_hint': 'اضغط CMD+K للبحث والتنقل',
 
@@ -109,8 +116,10 @@ const translations: Record<Language, Record<string, string>> = {
     'map.click_hint': 'انقر على العقدة لفحص بيانات القياس',
     'inspector.title': 'محلل القياس عن بُعد للعقدة',
     'inspector.complexity': 'COMPLEXITY INDEX',
-    'inspector.latency': 'BENCHMARK LATENCY',
+    'inspector.latency': 'LATENCY TARGET',
     'inspector.stack': 'حزمة التشغيل الأساسية',
+    'inspector.live': 'قياسات الحافة الحية // هذه الجلسة',
+    'inspector.rum': 'أداء المستخدمين الفعلي P75 // 7 أيام',
     'inspector.audience': 'المتلقي المستهدف',
     'inspector.artifact': 'رابط الوثيقة البرمجية',
 
@@ -126,12 +135,12 @@ const translations: Record<Language, Record<string, string>> = {
     'vault.code_snapshot': 'لقطة الشفرة البرمجية الموقوتة',
 
     // Dossier
-    'dossier.title': 'الملف الهندسي الأكاديمي',
-    'dossier.subtitle': 'محفظة الأبحاث المنشورة، ومعايير الأداء المقارنة، والاعتمادات للجان القبول ومختبرات البحث والتطوير المتقدمة.',
-    'dossier.target': 'موجّه إلى: لجان الدراسات العليا ومدراء مراكز الأبحاث في أمريكا الشمالية',
-    'dossier.case_studies': 'دراسات حالة النظم الهندسية',
-    'dossier.benchmarks': 'مقاييس الأداء التجريبية الموثقة',
-    'dossier.publications': 'تسلسل المنشورات الأكاديمية بتنسيق IEEE / ACM',
+    'dossier.title': 'المخططات المعمارية للنظم',
+    'dossier.subtitle': 'دراسات معمارية بأهداف تصميمية مُنمذجة، تُستبدل كل دراسة بنتائج مقاسة فعلياً عند اكتمال العمل على العتاد.',
+    'dossier.target': 'مرحلة التصميم // أهداف مُنمذجة وليست نتائج منشورة',
+    'dossier.case_studies': 'دراسات معمارية',
+    'dossier.benchmarks': 'الأهداف التصميمية',
+    'dossier.publications': 'خارطة الطريق البحثية',
 
     // Network
     'network.title': 'الشبكة العالمية للمهندسين',
@@ -139,44 +148,34 @@ const translations: Record<Language, Record<string, string>> = {
     'network.intake_title': 'بروتوكول الانضمام لمجتمع سلاك',
     'network.spotlights': 'مشاريع حية ومشاركات متميزة في ممر الربط الهندسي',
     'network.verify_handle': 'تحقق من المعرّف وأرسل الطلب',
+    'network.presence': 'التواجد الحي على الحافة',
+    'network.no_members': 'تُنشر المشاركات المميزة بعد التحقق من الأعضاء. كن الأول وأرسل معرّفك.',
   },
 };
 
 const DirectionContext = createContext<DirectionContextValue | null>(null);
 
-export function DirectionProvider({ children }: { children: React.ReactNode }) {
-  const [language, setLanguageState] = useState<Language>('en');
-
+export function DirectionProvider({
+  children,
+  initialLanguage,
+}: {
+  children: React.ReactNode;
+  initialLanguage: Language;
+}) {
+  const router = useRouter();
+  const [language, setLanguageState] = useState<Language>(initialLanguage);
   const direction: Direction = language === 'ar' ? 'rtl' : 'ltr';
 
-  useEffect(() => {
-    // Check saved language preference or system preference
-    const saved = localStorage.getItem('petabyte_lang') as Language;
-    if (saved === 'en' || saved === 'ar') {
-      setLanguageState(saved);
-    }
-  }, []);
-
+  // The route (/en | /ar) owns the language: switch instantly in place, then sync the URL for SEO and sharing.
   const setLanguage = (lang: Language) => {
+    if (lang === language) return;
     setLanguageState(lang);
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('petabyte_lang', lang);
-      document.documentElement.setAttribute('dir', lang === 'ar' ? 'rtl' : 'ltr');
-      document.documentElement.setAttribute('lang', lang);
-    }
+    document.documentElement.setAttribute('dir', lang === 'ar' ? 'rtl' : 'ltr');
+    document.documentElement.setAttribute('lang', lang);
+    router.replace(`/${lang}`, { scroll: false });
   };
 
-  const toggleLanguage = () => {
-    const next = language === 'en' ? 'ar' : 'en';
-    setLanguage(next);
-  };
-
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      document.documentElement.setAttribute('dir', direction);
-      document.documentElement.setAttribute('lang', language);
-    }
-  }, [direction, language]);
+  const toggleLanguage = () => setLanguage(language === 'en' ? 'ar' : 'en');
 
   const t = (key: string): string => {
     return translations[language][key] || translations['en'][key] || key;

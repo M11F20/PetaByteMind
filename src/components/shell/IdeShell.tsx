@@ -13,7 +13,7 @@ import { DossierWorkspace } from '@/components/workspaces/DossierWorkspace';
 import { NetworkWorkspace } from '@/components/workspaces/NetworkWorkspace';
 
 export function IdeShell() {
-  const { activeWorkspace } = useWorkspace();
+  const { activeWorkspace, commandPaletteOpen } = useWorkspace();
   const { direction, language } = useDirection();
 
   const renderActiveWorkspace = () => {
@@ -52,7 +52,7 @@ export function IdeShell() {
       <BottomStatusBar />
 
       {/* Cmd+K Command Palette Modal */}
-      <CommandPalette />
+      <CommandPalette key={commandPaletteOpen ? 'open' : 'closed'} />
     </div>
   );
 }

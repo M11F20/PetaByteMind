@@ -68,22 +68,18 @@ export interface DossierCaseStudy {
   systemSolutionAr: string;
   benchmarks: DossierBenchmark[];
   architectureDiagramType: string;
-  paperReference: {
-    venue: string;
-    doi: string;
-    preprintUrl: string;
-  };
+  status: 'DESIGN_STUDY' | 'MEASURED';
 }
 
-export interface NetworkMemberNode {
+export interface RoadmapItem {
   id: string;
-  callsign: string;
-  name: string;
-  hub: 'MENA' | 'NORTH_AMERICA';
-  location: string;
-  specialty: string;
-  activeProject: string;
-  status: 'ONLINE' | 'ACTIVE_BUILD' | 'DISPATCHING';
-  latency: string;
-  verifiedSlackNode: boolean;
+  kind: string;
+  status: 'PLANNED' | 'IN_PROGRESS' | 'COMPLETE';
+  title: string;
+  titleAr: string;
+  summary: string;
+  summaryAr: string;
+  deliverables: string[];
+  deliverablesAr: string[];
+  resultsStatus: 'PENDING' | 'PUBLISHED';
 }

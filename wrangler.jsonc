@@ -1,0 +1,54 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "petabytemind",
+  // Custom entry: wraps the OpenNext handler, routes WebSockets to the PresenceRoom DO, runs cron pruning.
+  "main": "workers/entry.ts",
+  "compatibility_date": "2026-10-01",
+  "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
+  "assets": {
+    "directory": ".open-next/assets",
+    "binding": "ASSETS"
+  },
+  // Declarative domain binding. If petabytemind.com is still attached to an older Worker/Pages project,
+  // detach it there first (Dashboard → Workers & Pages → <old project> → Domains), then deploy.
+  "routes": [
+    { "pattern": "petabytemind.com", "custom_domain": true },
+    { "pattern": "www.petabytemind.com", "custom_domain": true }
+  ],
+  "workers_dev": true,
+  "preview_urls": true,
+  "observability": { "enabled": true },
+  "placement": { "mode": "smart" },
+
+  // IDs are omitted on purpose: `wrangler deploy` auto-provisions D1 and KV on first deploy and binds them by name.
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "petabytemind",
+      "migrations_dir": "drizzle"
+    }
+  ],
+  "kv_namespaces": [{ "binding": "CACHE" }],
+
+  "durable_objects": {
+    "bindings": [{ "name": "PRESENCE", "class_name": "PresenceRoom" }]
+  },
+  "migrations": [{ "tag": "v1", "new_sqlite_classes": ["PresenceRoom"] }],
+
+  "ratelimits": [
+    { "name": "INTAKE_LIMITER", "namespace_id": "1001", "simple": { "limit": 3, "period": 60 } },
+    { "name": "TELEMETRY_LIMITER", "namespace_id": "1002", "simple": { "limit": 30, "period": 60 } }
+  ],
+
+  // Daily 03:17 UTC: prune web-vitals rows older than 30 days.
+  "triggers": { "crons": ["17 3 * * *"] },
+
+  "vars": {
+    "GITHUB_REPO": "M11F20/PetaByteMind",
+    "GITHUB_BRANCH": "main"
+  },
+  // SLACK_WEBHOOK_URL and GITHUB_TOKEN are optional secrets (see src/types/env.d.ts).
+  "secrets": {
+    "required": ["TURNSTILE_SECRET_KEY"]
+  }
+}
