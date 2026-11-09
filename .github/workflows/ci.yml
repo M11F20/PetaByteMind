@@ -28,7 +28,7 @@ jobs:
     name: Typecheck & lint
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
       - uses: actions/setup-node@v5
         with: { node-version: '${{ env.NODE_VERSION }}', cache: npm }
       - run: npm ci
@@ -46,7 +46,7 @@ jobs:
     needs: quality
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
       - uses: actions/setup-node@v5
         with: { node-version: '${{ env.NODE_VERSION }}', cache: npm }
       - run: npm ci
@@ -65,7 +65,7 @@ jobs:
     needs: quality
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
       - uses: actions/setup-node@v5
         with: { node-version: '${{ env.NODE_VERSION }}', cache: npm }
       - run: npm ci
@@ -96,7 +96,7 @@ jobs:
             echo "::notice::Preview skipped: add CLOUDFLARE_API_TOKEN and CLOUDFLARE_ACCOUNT_ID repository secrets to enable PR previews."
           fi
       - if: steps.creds.outputs.ready == 'true'
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
       - if: steps.creds.outputs.ready == 'true'
         uses: actions/setup-node@v5
         with: { node-version: '${{ env.NODE_VERSION }}', cache: npm }
@@ -152,7 +152,7 @@ jobs:
         run: |
           [[ -n "$CLOUDFLARE_API_TOKEN" && -n "$CLOUDFLARE_ACCOUNT_ID" ]] || {
             echo "::error::Set CLOUDFLARE_API_TOKEN and CLOUDFLARE_ACCOUNT_ID repository secrets before deploying."; exit 1; }
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
       - uses: actions/setup-node@v5
         with: { node-version: '${{ env.NODE_VERSION }}', cache: npm }
       - run: npm ci
